@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Donate',
-  description: 'Support the Al-Birr Society with your donation and help us continue our mission of serving the community.',
+  description: 'Support the Grand Coptic Benevolent Society with your donation and help us continue our mission of serving the community.',
 };
 
 const impactItems = [

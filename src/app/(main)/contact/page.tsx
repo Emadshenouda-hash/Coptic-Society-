@@ -7,7 +7,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
-  description: 'Get in touch with the Al-Birr Society. Find our address, phone number, and email, or use the contact form to send us a message.',
+  description: 'Get in touch with the Grand Coptic Benevolent Society. Find our address, phone number, and email, or use the contact form to send us a message.',
 };
 
 export default function ContactPage() {

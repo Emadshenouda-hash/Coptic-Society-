@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'News & Updates',
-  description: 'Stay up-to-date with the latest news, events, and announcements from the Al-Birr Society.',
+  description: 'Stay up-to-date with the latest news, events, and announcements from the Grand Coptic Benevolent Society.',
 };
 
 export default function NewsPage() {

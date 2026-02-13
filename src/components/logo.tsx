@@ -5,7 +5,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <Link href="/" className={cn('flex flex-col group', className)}>
       <span className="font-headline text-2xl font-bold leading-none text-primary group-hover:text-primary/80 transition-colors">
-        Al-Birr Society
+        Grand Coptic Benevolent Society
       </span>
       <span className="text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors">
         الجمعية القبطية الخيرية الكبرى

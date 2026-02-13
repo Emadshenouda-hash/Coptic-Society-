@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Bylaws',
-  description: 'Review the official bylaws of the Al-Birr Society or use our AI tool to summarize the document.',
+  description: 'Review the official bylaws of the Grand Coptic Benevolent Society or use our AI tool to summarize the document.',
 };
 
 export default function BylawsPage() {

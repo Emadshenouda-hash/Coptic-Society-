@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Governance',
-  description: 'Understand the governance structure of the Al-Birr Society, including the roles of the General Assembly and the Board of Directors.',
+  description: 'Understand the governance structure of the Grand Coptic Benevolent Society, including the roles of the General Assembly and the Board of Directors.',
 };
 
 export default function GovernancePage() {

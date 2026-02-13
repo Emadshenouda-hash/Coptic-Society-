@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Membership',
-  description: 'Learn how to become a member of the Al-Birr Society and join our mission to serve the community.',
+  description: 'Learn how to become a member of the Grand Coptic Benevolent Society and join our mission to serve the community.',
 };
 
 export default function MembershipPage() {
@@ -16,7 +16,7 @@ export default function MembershipPage() {
         <div className="text-center">
           <h1 className="font-headline text-4xl md:text-5xl text-primary">Join Our Mission</h1>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-            Become a member of the Al-Birr Society and be part of a legacy of compassion and service that spans over a century.
+            Become a member of the Grand Coptic Benevolent Society and be part of a legacy of compassion and service that spans over a century.
           </p>
         </div>
 

@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
-  title: 'Al-Birr Society | الجمعية القبطية الخيرية الكبرى',
+  title: 'Grand Coptic Benevolent Society | الجمعية القبطية الخيرية الكبرى',
   description:
     'The Grand Coptic Benevolent Society is a charitable, non-profit organisation founded in 1881 to serve needy families and promote social justice and dignity.',
 };
@@ -30,5 +30,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    
