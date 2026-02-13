@@ -11,7 +11,7 @@ import { useLanguage } from '@/context/language-context';
 
 const translations = {
   en: {
-    heroTitle: 'Serving Humanity Since 1881',
+    heroTitle: 'Serving Egypt since 1881',
     heroSubtitle: 'Enhancing social justice and dignity for needy families of all backgrounds across Egypt.',
     donateNow: 'Donate Now',
     learnMore: 'Learn More',
@@ -24,7 +24,7 @@ const translations = {
     viewAllNews: 'View All News',
   },
   ar: {
-    heroTitle: 'نخدم الإنسانية منذ ۱۸۸۱',
+    heroTitle: 'نخدم مصر منذ ۱۸۸۱',
     heroSubtitle: 'تعزيز العدالة الاجتماعية والكرامة للأسر المحتاجة من جميع الخلفيات في جميع أنحاء مصر.',
     donateNow: 'تبرع الآن',
     learnMore: 'اعرف المزيد',
