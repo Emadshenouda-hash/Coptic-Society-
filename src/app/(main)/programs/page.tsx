@@ -1,22 +1,42 @@
+'use client';
+
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { programs } from '@/lib/content';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { Metadata } from 'next';
+import { useLanguage } from '@/context/language-context';
+import { useEffect } from 'react';
 
-export const metadata: Metadata = {
-  title: 'Our Programs',
-  description: 'Explore the diverse programs offered by the Al-Birr Society, from social assistance and healthcare to education and community development.',
+const translations = {
+  en: {
+    title: 'Our Programs',
+    description: 'Explore the diverse programs offered by the Grand Coptic Benevolent Society, from social assistance and healthcare to education and community development.',
+    pageTitle: 'Our Fields of Action',
+    pageSubtitle: 'We are dedicated to holistic community development through a wide range of targeted programs.',
+  },
+  ar: {
+    title: 'برامجنا',
+    description: 'استكشف البرامج المتنوعة التي تقدمها الجمعية القبطية الخيرية الكبرى، من المساعدات الاجتماعية والرعاية الصحية إلى التعليم وتنمية المجتمع.',
+    pageTitle: 'مجالات عملنا',
+    pageSubtitle: 'نحن ملتزمون بالتنمية المجتمعية الشاملة من خلال مجموعة واسعة من البرامج الموجهة.',
+  }
 };
 
 export default function ProgramsPage() {
+  const { language, direction } = useLanguage();
+  const t = translations[language];
+
+  useEffect(() => {
+    document.title = `${t.title} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
+  }, [t.title, language]);
+
   return (
-    <div className="bg-background">
+    <div className="bg-background" dir={direction}>
       <div className="container py-16 lg:py-24">
         <div className="text-center">
-          <h1 className="font-headline text-4xl md:text-5xl text-primary">Our Fields of Action</h1>
+          <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-            We are dedicated to holistic community development through a wide range of targeted programs.
+            {t.pageSubtitle}
           </p>
         </div>
 
@@ -26,7 +46,7 @@ export default function ProgramsPage() {
               {programs.map((program) => (
                 <TabsTrigger key={program.id} value={program.id} className="flex flex-col md:flex-row gap-2 h-auto py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                    <program.icon className="h-5 w-5" /> 
-                   <span className="font-medium">{program.title}</span>
+                   <span className="font-medium">{language === 'ar' ? program.titleAr : program.title}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -35,8 +55,8 @@ export default function ProgramsPage() {
               <TabsContent key={program.id} value={program.id} className="mt-8 rounded-lg border bg-card p-6 lg:p-8">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
                     <div className="lg:col-span-3">
-                        <h2 className="font-headline text-3xl text-primary">{program.title}</h2>
-                        <p className="mt-4 text-muted-foreground prose max-w-none">{program.description}</p>
+                        <h2 className="font-headline text-3xl text-primary">{language === 'ar' ? program.titleAr : program.title}</h2>
+                        <p className="mt-4 text-muted-foreground prose max-w-none">{language === 'ar' ? program.descriptionAr : program.description}</p>
                     </div>
                     <div className="lg:col-span-2 grid grid-cols-2 gap-4">
                         {program.gallery.map(imageId => {

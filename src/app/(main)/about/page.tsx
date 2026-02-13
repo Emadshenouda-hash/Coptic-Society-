@@ -1,35 +1,67 @@
+'use client';
+
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Metadata } from 'next';
+import { useLanguage } from '@/context/language-context';
+import { useEffect } from 'react';
 
-export const metadata: Metadata = {
-  title: 'About Us',
-  description: 'Learn about the history, mission, and vision of the Grand Coptic Benevolent Society, founded in 1881.',
+const translations = {
+  en: {
+    title: 'About Us',
+    description: 'Learn about the history, mission, and vision of the Grand Coptic Benevolent Society, founded in 1881.',
+    pageTitle: 'Our Story of Service',
+    pageSubtitle: 'Founded in 1881, the Grand Coptic Benevolent Society has a long and proud history of compassionate service and community building.',
+    mission: 'Our Mission',
+    missionText: 'To serve needy families of all backgrounds, enhance social justice and dignity, and promote cultural, scientific, and religious awareness. We are a charitable, non-profit organisation committed to making a tangible difference in the lives of the most vulnerable.',
+    vision: 'Our Vision',
+    visionText: 'We envision a society where every individual has the opportunity to live a life of dignity, health, and purpose. We strive to be a leading force in combating poverty and illiteracy, working hand-in-hand with communities to build a brighter, more equitable future for all Egyptians.',
+    registration: 'Official Registration',
+    registrationText: 'The Grand Coptic Benevolent Society (الجمعية القبطية الخيرية الكبرى) is officially registered in Cairo under registration number 1080 on April 29, 1967. Our headquarters are located at 175 Ramsis Street, Cairo, with branches across Egypt.',
+  },
+  ar: {
+    title: 'من نحن',
+    description: 'تعرف على تاريخ ورسالة ورؤية الجمعية القبطية الخيرية الكبرى التي تأسست عام 1881.',
+    pageTitle: 'قصتنا في الخدمة',
+    pageSubtitle: 'تأسست الجمعية القبطية الخيرية الكبرى عام 1881، ولها تاريخ طويل ومشرف من الخدمة الرحيمة وبناء المجتمع.',
+    mission: 'رسالتنا',
+    missionText: 'خدمة الأسر المحتاجة من جميع الخلفيات، وتعزيز العدالة الاجتماعية والكرامة، ونشر الوعي الثقافي والعلمي والديني. نحن منظمة خيرية غير ربحية ملتزمة بإحداث فرق ملموس في حياة الفئات الأكثر ضعفًا.',
+    vision: 'رؤيتنا',
+    visionText: 'نتطلع إلى مجتمع يتمتع فيه كل فرد بفرصة العيش بكرامة وصحة وهدف. نسعى جاهدين لنكون قوة رائدة في مكافحة الفقر والأمية، ونعمل جنبًا إلى جنب مع المجتمعات لبناء مستقبل أكثر إشراقًا وإنصافًا لجميع المصريين.',
+    registration: 'التسجيل الرسمي',
+    registrationText: 'الجمعية القبطية الخيرية الكبرى مسجلة رسميًا في القاهرة برقم 1080 بتاريخ 29 أبريل 1967. يقع مقرنا الرئيسي في 175 شارع رمسيس، القاهرة، ولدينا فروع في جميع أنحاء مصر.',
+  }
 };
 
 
 export default function AboutPage() {
+  const { language, direction } = useLanguage();
+  const t = translations[language];
   const heritageImage = PlaceHolderImages.find(img => img.id === 'about-heritage');
+  
+  useEffect(() => {
+    document.title = `${t.title} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
+  }, [t.title, language]);
+
   return (
-    <div className="bg-background">
+    <div className="bg-background" dir={direction}>
       <div className="container py-16 lg:py-24">
         <div className="text-center">
-          <h1 className="font-headline text-4xl md:text-5xl text-primary">Our Story of Service</h1>
+          <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
           <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-            Founded in 1881, the Grand Coptic Benevolent Society has a long and proud history of compassionate service and community building.
+            {t.pageSubtitle}
           </p>
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-2 items-center">
            <div className="prose prose-lg max-w-none text-foreground">
-            <h2 className="font-headline text-primary">Our Mission</h2>
+            <h2 className="font-headline text-primary">{t.mission}</h2>
             <p>
-              To serve needy families of all backgrounds, enhance social justice and dignity, and promote cultural, scientific, and religious awareness. We are a charitable, non-profit organisation committed to making a tangible difference in the lives of the most vulnerable.
+              {t.missionText}
             </p>
-            <h2 className="font-headline text-primary">Our Vision</h2>
+            <h2 className="font-headline text-primary">{t.vision}</h2>
             <p>
-              We envision a society where every individual has the opportunity to live a life of dignity, health, and purpose. We strive to be a leading force in combating poverty and illiteracy, working hand-in-hand with communities to build a brighter, more equitable future for all Egyptians.
+              {t.visionText}
             </p>
            </div>
           {heritageImage && (
@@ -48,11 +80,11 @@ export default function AboutPage() {
         <div className="mt-20">
             <Card className="bg-secondary">
                 <CardHeader>
-                    <CardTitle className="font-headline text-2xl text-primary">Official Registration</CardTitle>
+                    <CardTitle className="font-headline text-2xl text-primary">{t.registration}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-muted-foreground">
-                        The Grand Coptic Benevolent Society (الجمعية القبطية الخيرية الكبرى) is officially registered in Cairo under registration number <strong className="text-foreground">1080</strong> on <strong className="text-foreground">April 29, 1967</strong>. Our headquarters are located at 175 Ramsis Street, Cairo, with branches across Egypt.
+                        {t.registrationText}
                     </p>
                 </CardContent>
             </Card>

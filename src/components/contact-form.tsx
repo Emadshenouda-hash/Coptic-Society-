@@ -19,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { useLanguage } from '@/context/language-context';
 
 const contactFormSchema = z.object({
   fullName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -29,11 +30,71 @@ const contactFormSchema = z.object({
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
+const translations = {
+  en: {
+    fullNameLabel: 'Full Name',
+    fullNamePlaceholder: 'Your Full Name',
+    emailLabel: 'Email Address',
+    emailPlaceholder: 'you@example.com',
+    subjectLabel: 'Subject',
+    subjectPlaceholder: 'Reason for contacting',
+    messageLabel: 'Message',
+    messagePlaceholder: 'Your message here...',
+    sending: 'Sending...',
+    sendMessage: 'Send Message',
+    errorOccurred: 'An error occurred',
+    dbUnavailable: 'Database service is not available.',
+    messageSent: 'Message Sent!',
+    messageSentDesc: 'Thank you for your message! We will get back to you shortly.',
+    couldNotSend: 'Could not send your message. Please try again later.',
+    validation: {
+      nameMin: 'Name must be at least 2 characters.',
+      emailInvalid: 'Please enter a valid email.',
+      subjectMin: 'Subject must be at least 5 characters.',
+      messageMin: 'Message must be at least 10 characters.',
+    }
+  },
+  ar: {
+    fullNameLabel: 'الاسم الكامل',
+    fullNamePlaceholder: 'اسمك الكامل',
+    emailLabel: 'البريد الإلكتروني',
+    emailPlaceholder: 'you@example.com',
+    subjectLabel: 'الموضوع',
+    subjectPlaceholder: 'سبب التواصل',
+    messageLabel: 'الرسالة',
+    messagePlaceholder: 'رسالتك هنا...',
+    sending: 'جار الإرسال...',
+    sendMessage: 'إرسال الرسالة',
+    errorOccurred: 'حدث خطأ',
+    dbUnavailable: 'خدمة قاعدة البيانات غير متوفرة.',
+    messageSent: 'تم إرسال الرسالة!',
+    messageSentDesc: 'شكرا لرسالتك! سوف نعود اليكم قريبا.',
+    couldNotSend: 'لا يمكن إرسال رسالتك. يرجى المحاولة مرة أخرى في وقت لاحق.',
+    validation: {
+      nameMin: 'يجب أن يتكون الاسم من حرفين على الأقل.',
+      emailInvalid: 'يرجى إدخال بريد إلكتروني صحيح.',
+      subjectMin: 'يجب أن يتكون الموضوع من 5 أحرف على الأقل.',
+      messageMin: 'يجب أن تتكون الرسالة من 10 أحرف على الأقل.',
+    }
+  }
+};
+
+
 export function ContactForm() {
   const firestore = useFirestore();
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = translations[language];
+
+  const translatedSchema = z.object({
+    fullName: z.string().min(2, { message: t.validation.nameMin }),
+    email: z.string().email({ message: t.validation.emailInvalid }),
+    subject: z.string().min(5, { message: t.validation.subjectMin }),
+    message: z.string().min(10, { message: t.validation.messageMin }),
+  });
+
   const form = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
+    resolver: zodResolver(translatedSchema),
     defaultValues: {
       fullName: '',
       email: '',
@@ -41,15 +102,15 @@ export function ContactForm() {
       message: '',
     },
   });
-
+  
   const { isSubmitting } = form.formState;
 
   const onSubmit = async (values: ContactFormValues) => {
     if (!firestore) {
       toast({
         variant: 'destructive',
-        title: 'An error occurred',
-        description: 'Database service is not available.',
+        title: t.errorOccurred,
+        description: t.dbUnavailable,
       });
       return;
     }
@@ -65,16 +126,16 @@ export function ContactForm() {
       addDocumentNonBlocking(contactSubmissionsRef, submission);
 
       toast({
-        title: 'Message Sent!',
-        description: 'Thank you for your message! We will get back to you shortly.',
+        title: t.messageSent,
+        description: t.messageSentDesc,
       });
       form.reset();
     } catch (error) {
       console.error('Error submitting contact form:', error);
       toast({
         variant: 'destructive',
-        title: 'An error occurred',
-        description: 'Could not send your message. Please try again later.',
+        title: t.errorOccurred,
+        description: t.couldNotSend,
       });
     }
   };
@@ -87,9 +148,9 @@ export function ContactForm() {
           name="fullName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>{t.fullNameLabel}</FormLabel>
               <FormControl>
-                <Input placeholder="Your Full Name" {...field} />
+                <Input placeholder={t.fullNamePlaceholder} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,9 +161,9 @@ export function ContactForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>{t.emailLabel}</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="you@example.com" {...field} />
+                <Input type="email" placeholder={t.emailPlaceholder} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,9 +174,9 @@ export function ContactForm() {
           name="subject"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject</FormLabel>
+              <FormLabel>{t.subjectLabel}</FormLabel>
               <FormControl>
-                <Input placeholder="Reason for contacting" {...field} />
+                <Input placeholder={t.subjectPlaceholder} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,9 +187,9 @@ export function ContactForm() {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Message</FormLabel>
+              <FormLabel>{t.messageLabel}</FormLabel>
               <FormControl>
-                <Textarea placeholder="Your message here..." rows={6} {...field} />
+                <Textarea placeholder={t.messagePlaceholder} rows={6} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -137,16 +198,14 @@ export function ContactForm() {
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Sending...
+              <Loader2 className="mr-2 h-4 w-4 animate-spin rtl:ml-2 rtl:mr-0" />
+              {t.sending}
             </>
           ) : (
-            'Send Message'
+            t.sendMessage
           )}
         </Button>
       </form>
     </Form>
   );
 }
-
-    
