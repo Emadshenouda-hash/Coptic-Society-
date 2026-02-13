@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "home-hero",
-      "description": "A diverse group of volunteers working together in a community project, symbolizing unity and service.",
-      "imageUrl": "https://images.unsplash.com/photo-1706806595136-5afefb45da1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21tdW5pdHklMjB2b2x1bnRlZXJzfGVufDB8fHx8MTc3MDk5Mzc0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "community volunteers"
+      "description": "A historic, sepia-toned photograph of the Grand Coptic Benevolent Society's original building.",
+      "imageUrl": "/images/gcbs-historic-building.jpg",
+      "imageHint": "historic building society"
     },
     {
       "id": "about-heritage",
