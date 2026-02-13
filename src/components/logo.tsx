@@ -18,7 +18,8 @@ export function Logo({ className }: { className?: string }) {
     <span
       className={cn(
         'font-bold leading-none text-primary group-hover:text-primary/80 transition-colors',
-        language === 'en' ? `${montserrat.className} text-2xl` : `${montserrat.className} text-sm`
+        montserrat.className,
+        language === 'en' ? `text-base` : `text-xs`
       )}
     >
       Grand Coptic Benevolent Society
@@ -28,10 +29,10 @@ export function Logo({ className }: { className?: string }) {
   const arName = (
     <span
       className={cn(
-        'group-hover:text-foreground/80 transition-colors',
+        'group-hover:text-foreground/80 transition-colors font-arabic',
         language === 'ar'
-          ? 'font-arabic text-2xl font-bold text-primary'
-          : 'text-xs text-muted-foreground font-arabic'
+          ? 'text-lg font-bold text-primary'
+          : 'text-xs text-muted-foreground'
       )}
     >
       الجمعية القبطية الخيرية الكبرى
@@ -39,7 +40,7 @@ export function Logo({ className }: { className?: string }) {
   );
 
   return (
-    <Link href="/" className={cn('flex flex-col group', className, language === 'ar' ? 'items-end' : 'items-start')}>
+    <Link href="/" className={cn('flex flex-col group py-2', className, language === 'ar' ? 'items-end' : 'items-start')}>
       {language === 'en' ? (
         <>
           {enName}

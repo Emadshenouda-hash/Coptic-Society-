@@ -1,14 +1,13 @@
-<svg width="1400" height="300" viewBox="0 0 1400 300" xmlns="http://www.w3.org/2000/svg">
-  <!--This font is hosted by Google Fonts.-->
-  <defs>
-    <style type="text/css">@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700&amp;display=swap');</style>
-  </defs>
-  <text
-    x="50%"
-    y="50%"
-    dominant-baseline="middle"
-    text-anchor="middle"
-    style="font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 160px; fill: #3f518c;">
-    الجمعية القبطية الخيرية الكبرى
-  </text>
+<svg viewBox="0 0 800 100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .arabic-text {
+      font-family: 'Cairo', 'Amiri', serif;
+      font-size: 72px;
+      font-weight: bold;
+      fill: hsl(221 44% 41%);
+      text-anchor: middle;
+      dominant-baseline: hanging;
+    }
+  </style>
+  <text x="50%" y="10" class="arabic-text">الجمعية القبطية الخيرية الكبرى</text>
 </svg>

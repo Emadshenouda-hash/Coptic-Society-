@@ -1,4 +1,3 @@
-
 'use client';
 import Image from "next/image";
 import { Montserrat } from "next/font/google";
@@ -28,17 +27,17 @@ export function BrandHeader() {
               src="/assets/logo-arabic.svg"
               alt={t.alt}
               width={720}
-              height={150}
+              height={100}
               priority
               className="w-full max-w-2xl h-auto"
             />
         </div>
 
         <div className={cn(montserrat.className, "bg-primary text-primary-foreground rounded-lg p-4")}>
-          <h1 className="m-0 font-bold uppercase tracking-[0.12em] text-[clamp(1rem,2.2vw,1.375rem)] leading-tight">
+          <h1 className="m-0 font-bold uppercase tracking-wider text-lg md:text-xl lg:text-2xl leading-tight">
             THE GRAND COPTIC BENEVOLENT SOCIETY
           </h1>
-          <p className="mt-2.5 mb-0 font-light uppercase tracking-[0.25em] text-[clamp(0.5625rem,1.2vw,0.75rem)] leading-tight opacity-95">
+          <p className="mt-2 mb-0 font-light uppercase tracking-widest text-xs md:text-sm leading-tight opacity-95">
             FOUNDED BY THE LATE BOUTROS PASHA GHALI
           </p>
         </div>
