@@ -3,9 +3,10 @@
 import { useAdminAuth } from '@/hooks/use-admin-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 export default function SecureAdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, isLoading } = useAdminAuth();
@@ -14,12 +15,12 @@ export default function SecureAdminLayout({ children }: { children: React.ReactN
   useEffect(() => {
     // Wait until loading is complete before making a decision.
     if (!isLoading) {
-      // If we are done loading and there is no user, or the user is not an admin, redirect to login.
-      if (!user || !isAdmin) {
+      // If we are done loading and there is no user, redirect to login.
+      if (!user) {
         router.replace('/admin/login');
       }
     }
-  }, [user, isAdmin, isLoading, router]);
+  }, [user, isLoading, router]);
 
   // While loading, show a spinner.
   if (isLoading) {
@@ -30,10 +31,30 @@ export default function SecureAdminLayout({ children }: { children: React.ReactN
     );
   }
 
-  // If loading is finished and we still don't have an admin user,
+  // If loading is finished and we still don't have a user,
   // render nothing while the redirect initiated by the useEffect takes place.
-  if (!user || !isAdmin) {
+  if (!user) {
     return null;
+  }
+  
+  // If the user is logged in but is NOT an admin, show an "Access Denied" message.
+  // This prevents the redirect loop.
+  if (!isAdmin) {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-secondary p-4">
+            <Card className="w-full max-w-md text-center shadow-lg">
+                <CardHeader>
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+                        <ShieldAlert className="h-6 w-6 text-destructive" />
+                    </div>
+                    <CardTitle className="mt-4 text-2xl font-bold">Access Denied</CardTitle>
+                    <CardDescription>
+                        You do not have the necessary permissions to access this page. Please contact the site administrator if you believe this is an error.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+      </div>
+    );
   }
 
   // If loading is finished and the user is an admin, render the admin panel.
