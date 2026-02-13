@@ -3,6 +3,13 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/context/language-context';
+import { Montserrat } from 'next/font/google';
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['700'],
+  display: 'swap',
+});
 
 export function Logo({ className }: { className?: string }) {
   const { language } = useLanguage();
@@ -10,8 +17,8 @@ export function Logo({ className }: { className?: string }) {
   const enName = (
     <span
       className={cn(
-        'font-headline font-bold leading-none text-primary group-hover:text-primary/80 transition-colors',
-        language === 'en' ? 'text-2xl' : 'text-sm'
+        'font-bold leading-none text-primary group-hover:text-primary/80 transition-colors',
+        language === 'en' ? `${montserrat.className} text-2xl` : `${montserrat.className} text-sm`
       )}
     >
       Grand Coptic Benevolent Society
