@@ -43,11 +43,11 @@ export default function HomePage() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'home-hero');
   const programIcons = programs.slice(0, 6);
   const recentNews = newsArticles.slice(0, 3);
-  const { language } = useLanguage();
+  const { language, direction } = useLanguage();
   const t = translations[language];
 
   return (
-    <div className="flex-1">
+    <div className="flex-1" dir={direction}>
       {/* Hero Section */}
       <section className="relative h-[60vh] min-h-[400px] w-full">
         {heroImage && (
@@ -97,10 +97,10 @@ export default function HomePage() {
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent">
                     <program.icon className="h-8 w-8" />
                   </div>
-                  <CardTitle className="font-headline pt-4">{program.title}</CardTitle>
+                  <CardTitle className="font-headline pt-4">{language === 'ar' ? program.titleAr : program.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground text-sm">{program.description.substring(0, 100)}...</p>
+                  <p className="text-muted-foreground text-sm">{(language === 'ar' ? program.descriptionAr : program.description).substring(0, 100)}...</p>
                   <Button variant="link" asChild className="mt-4 text-accent hover:text-accent/80">
                     <Link href={`/programs#${program.id}`}>{t.readMore} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
                   </Button>
@@ -137,11 +137,11 @@ export default function HomePage() {
                     </div>
                   )}
                   <CardHeader>
-                    <span className="text-xs text-muted-foreground">{new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    <CardTitle className="font-headline text-lg">{article.title}</CardTitle>
+                    <span className="text-xs text-muted-foreground">{new Date(article.date).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <CardTitle className="font-headline text-lg">{language === 'ar' ? article.titleAr : article.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground">{article.excerpt}</p>
+                    <p className="text-sm text-muted-foreground">{language === 'ar' ? article.excerptAr : article.excerpt}</p>
                   </CardContent>
                   <div className="p-6 pt-0">
                     <Button variant="link" asChild className="p-0 text-accent hover:text-accent/80">
