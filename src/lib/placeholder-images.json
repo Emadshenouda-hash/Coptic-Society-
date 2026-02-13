@@ -1,3 +1,106 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "home-hero",
+      "description": "A diverse group of volunteers working together in a community project, symbolizing unity and service.",
+      "imageUrl": "https://images.unsplash.com/photo-1706806595136-5afefb45da1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21tdW5pdHklMjB2b2x1bnRlZXJzfGVufDB8fHx8MTc3MDk5Mzc0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community volunteers"
+    },
+    {
+      "id": "about-heritage",
+      "description": "An old, sepia-toned photograph of a historic building, representing the society's long heritage.",
+      "imageUrl": "https://images.unsplash.com/photo-1635446433674-c4c4e686a0ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxoaXN0b3JpYyUyMGJ1aWxkaW5nfGVufDB8fHx8MTc3MDkyNTk2Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "historic building"
+    },
+    {
+      "id": "program-social-1",
+      "description": "A volunteer handing a bag of groceries to a smiling person.",
+      "imageUrl": "https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmb29kJTIwZG9uYXRpb258ZW58MHx8fHwxNzcwOTkwOTI5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "food donation"
+    },
+    {
+      "id": "program-social-2",
+      "description": "Hands holding a small seedling, representing growth and microloans.",
+      "imageUrl": "https://images.unsplash.com/photo-1763856957026-a74ab4f05891?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzZWVkbGluZyUyMGhhbmRzfGVufDB8fHx8MTc3MDk5Mzc0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "seedling hands"
+    },
+    {
+      "id": "program-health-1",
+      "description": "A doctor with a stethoscope checking a child's health in a clean, bright clinic.",
+      "imageUrl": "https://images.unsplash.com/photo-1758691463331-2ac00e6f676f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkb2N0b3IlMjBjaGlsZHxlbnwwfHx8fDE3NzA5OTM3NDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "doctor child"
+    },
+    {
+      "id": "program-health-2",
+      "description": "A mobile medical van parked in a rural village.",
+      "imageUrl": "https://images.unsplash.com/photo-1634330737124-e584ef52a2ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtZWRpY2FsJTIwdmFufGVufDB8fHx8MTc3MDk5Mzc0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "medical van"
+    },
+    {
+      "id": "program-edu-1",
+      "description": "A teacher helping a young student with their schoolwork in a classroom.",
+      "imageUrl": "https://images.unsplash.com/photo-1509062522246-3755977927d7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx0ZWFjaGVyJTIwc3R1ZGVudHxlbnwwfHx8fDE3NzA5MDMyODl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "teacher student"
+    },
+    {
+      "id": "program-edu-2",
+      "description": "A woman learning a new skill on a sewing machine in a vocational training center.",
+      "imageUrl": "https://images.unsplash.com/photo-1671708457218-74e9983bc767?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx2b2NhdGlvbmFsJTIwdHJhaW5pbmd8ZW58MHx8fHwxNzcwOTkzNzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "vocational training"
+    },
+    {
+      "id": "program-culture-1",
+      "description": "A lively cultural festival with traditional music and dance.",
+      "imageUrl": "https://images.unsplash.com/photo-1722489399551-2acbd1bf83a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjdWx0dXJhbCUyMGZlc3RpdmFsfGVufDB8fHx8MTc3MDk5Mzc0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cultural festival"
+    },
+    {
+      "id": "program-community-1",
+      "description": "A group of people participating in a community clean-up drive.",
+      "imageUrl": "https://images.unsplash.com/photo-1619031935811-55605fca90b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb21tdW5pdHklMjBjbGVhbnVwfGVufDB8fHx8MTc3MDk5Mzc0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community cleanup"
+    },
+    {
+      "id": "program-elderly-1",
+      "description": "An elderly person and a caregiver sharing a warm conversation.",
+      "imageUrl": "https://images.unsplash.com/photo-1542622475-904e18612fa1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxlbGRlcmx5JTIwY2FyZXxlbnwwfHx8fDE3NzA4Nzc5ODN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "elderly care"
+    },
+    {
+      "id": "program-child-1",
+      "description": "Children playing and learning together in a colorful kindergarten.",
+      "imageUrl": "https://images.unsplash.com/photo-1647627611823-d08fa901678e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjaGlsZHJlbiUyMHBsYXlpbmd8ZW58MHx8fHwxNzcwOTA4MjA0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "children playing"
+    },
+    {
+      "id": "news-1",
+      "description": "An announcement being made at a community event.",
+      "imageUrl": "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21tdW5pdHklMjBldmVudHxlbnwwfHx8fDE3NzA5MjYyMDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community event"
+    },
+    {
+      "id": "news-2",
+      "description": "Volunteers packing relief goods into boxes.",
+      "imageUrl": "https://images.unsplash.com/photo-1757940059959-662478f87b72?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxyZWxpZWYlMjBnb29kc3xlbnwwfHx8fDE3NzA5OTM3NDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "relief goods"
+    },
+    {
+      "id": "news-3",
+      "description": "A group of people attending a seminar or lecture.",
+      "imageUrl": "https://images.unsplash.com/photo-1769755448957-59390ffbe93e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzZW1pbmFyJTIwYXVkaWVuY2V8ZW58MHx8fHwxNzcwOTkzNzQ2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "seminar audience"
+    },
+    {
+      "id": "governance-chart",
+      "description": "A formal meeting room with a large table, symbolizing governance and board meetings.",
+      "imageUrl": "https://images.unsplash.com/photo-1461782296610-c552d61b149a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxib2FyZHJvb20lMjBtZWV0aW5nfGVufDB8fHx8MTc3MDk5Mzc0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "boardroom meeting"
+    },
+    {
+      "id": "contact-us",
+      "description": "The facade of the society's headquarters at 175 Ramsis Street, Cairo.",
+      "imageUrl": "https://images.unsplash.com/photo-1550510537-64a36484eae2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxvZmZpY2UlMjBidWlsZGluZ3xlbnwwfHx8fDE3NzA5NTgxNzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "office building"
+    }
+  ]
 }

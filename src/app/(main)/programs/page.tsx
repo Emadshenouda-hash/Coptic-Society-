@@ -1,0 +1,67 @@
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { programs } from '@/lib/content';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Our Programs',
+  description: 'Explore the diverse programs offered by the Al-Birr Society, from social assistance and healthcare to education and community development.',
+};
+
+export default function ProgramsPage() {
+  return (
+    <div className="bg-background">
+      <div className="container py-16 lg:py-24">
+        <div className="text-center">
+          <h1 className="font-headline text-4xl md:text-5xl text-primary">Our Fields of Action</h1>
+          <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
+            We are dedicated to holistic community development through a wide range of targeted programs.
+          </p>
+        </div>
+
+        <div className="mt-12">
+          <Tabs defaultValue={programs[0].id} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 h-auto">
+              {programs.map((program) => (
+                <TabsTrigger key={program.id} value={program.id} className="flex flex-col md:flex-row gap-2 h-auto py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                   <program.icon className="h-5 w-5" /> 
+                   <span className="font-medium">{program.title}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {programs.map((program) => (
+              <TabsContent key={program.id} value={program.id} className="mt-8 rounded-lg border bg-card p-6 lg:p-8">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+                    <div className="lg:col-span-3">
+                        <h2 className="font-headline text-3xl text-primary">{program.title}</h2>
+                        <p className="mt-4 text-muted-foreground prose max-w-none">{program.description}</p>
+                    </div>
+                    <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+                        {program.gallery.map(imageId => {
+                            const image = PlaceHolderImages.find(p => p.id === imageId);
+                            if (!image) return null;
+                            return (
+                                <div key={imageId} className="relative aspect-square w-full overflow-hidden rounded-md shadow-md">
+                                    <Image 
+                                        src={image.imageUrl} 
+                                        alt={image.description} 
+                                        fill 
+                                        className="object-cover transition-transform hover:scale-105"
+                                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 20vw, 15vw"
+                                        data-ai-hint={image.imageHint}
+                                    />
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
+}
