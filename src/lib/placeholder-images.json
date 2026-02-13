@@ -3,7 +3,7 @@
     {
       "id": "home-hero",
       "description": "A historic photograph of the Grand Coptic Benevolent Society building.",
-      "imageUrl": "/gcbs-historic-building.jpg",
+      "imageUrl": "/assets/gcbs-historic-building.jpg",
       "imageHint": "historic building cairo"
     },
     {
