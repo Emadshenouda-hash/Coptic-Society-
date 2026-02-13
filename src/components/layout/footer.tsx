@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { Mail, MapPin, Phone } from 'lucide-react';
-import { Logo } from '@/components/logo';
 import { useLanguage } from '@/context/language-context';
+import { cn } from '@/lib/utils';
 
 const translations = {
   en: {
@@ -14,7 +14,9 @@ const translations = {
     contact: 'Contact',
     contactUs: 'Contact Us',
     copyright: 'Grand Coptic Benevolent Society. All rights reserved.',
-    description: 'A charitable, non-profit organisation founded in 1881 to serve needy families, enhance social justice, and promote cultural awareness.'
+    description: 'A charitable, non-profit organisation founded in 1881 to serve needy families, enhance social justice, and promote cultural awareness.',
+    societyName: 'Grand Coptic Benevolent Society',
+    societyNameAr: 'الجمعية القبطية الخيرية الكبرى'
   },
   ar: {
     quickLinks: 'روابط سريعة',
@@ -24,7 +26,9 @@ const translations = {
     contact: 'اتصل بنا',
     contactUs: 'اتصل بنا',
     copyright: 'الجمعية القبطية الخيرية الكبرى. جميع الحقوق محفوظة.',
-    description: 'جمعية خيرية غير هادفة للربح تأسست عام 1881 لخدمة الأسر المحتاجة وتعزيز العدالة الاجتماعية والوعي الثقافي.'
+    description: 'جمعية خيرية غير هادفة للربح تأسست عام 1881 لخدمة الأسر المحتاجة وتعزيز العدالة الاجتماعية والوعي الثقافي.',
+    societyName: 'Grand Coptic Benevolent Society',
+    societyNameAr: 'الجمعية القبطية الخيرية الكبرى'
   }
 }
 
@@ -37,7 +41,11 @@ export function Footer() {
       <div className="container px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4 rtl:text-right">
           <div className="md:col-span-2">
-            <Logo />
+            <div className={cn("flex flex-col", language === 'ar' ? 'items-end' : 'items-start')}>
+              <h3 className={cn("font-bold text-primary", language === 'ar' ? "font-amiri text-2xl" : "font-montserrat text-lg")}>
+                {language === 'ar' ? t.societyNameAr : t.societyName}
+              </h3>
+            </div>
             <p className="mt-4 max-w-md text-sm">
               {t.description}
             </p>

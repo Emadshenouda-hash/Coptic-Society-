@@ -7,7 +7,6 @@ import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Logo } from '@/components/logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { useLanguage } from '@/context/language-context';
 
@@ -36,7 +35,6 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-6">
-          <Logo />
           <nav className="hidden items-center gap-4 md:flex">
             {navLinks.map((link) => (
               <Link
@@ -71,7 +69,7 @@ export function Header() {
             <SheetContent side={language === 'ar' ? 'right' : 'left'}>
               <div className="flex h-full flex-col">
                 <div className="border-b p-4">
-                  <Logo />
+                  <span className="font-bold text-lg">Menu</span>
                 </div>
                 <nav className="flex flex-col gap-4 p-4 rtl:text-right">
                   {navLinks.map((link) => (

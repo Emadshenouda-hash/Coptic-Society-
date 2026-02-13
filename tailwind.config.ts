@@ -14,6 +14,8 @@ export default {
         headline: ['Belleza', 'sans-serif'],
         arabic: ['Cairo', 'sans-serif'],
         code: ['monospace'],
+        amiri: ['Amiri', 'serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
