@@ -13,8 +13,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Progress } from './ui/progress';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, serverTimestamp } from 'firebase/firestore';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, serverTimestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 
@@ -176,7 +175,7 @@ export function DonateForm() {
       };
 
       const donationsRef = collection(firestore, 'donations');
-      addDocumentNonBlocking(donationsRef, donationData);
+      await addDoc(donationsRef, donationData);
       
       setCurrentStep(4);
 
@@ -206,7 +205,7 @@ export function DonateForm() {
       <CardContent>
         {currentStep === 1 && (
           <div className="space-y-6">
-            <h3 className="font-headline text-xl">1. {t.step1Title}</h3>
+            <h3 className="font-headline text-xl">{t.step1Title}</h3>
             <RadioGroup value={isRecurring ? 'monthly' : 'one-time'} onValueChange={(val) => setIsRecurring(val === 'monthly')} className="flex gap-4">
                 <Label htmlFor="one-time" className="flex items-center gap-2 p-4 border rounded-md cursor-pointer flex-1 has-[:checked]:bg-accent/20 has-[:checked]:border-accent transition-all">
                     <RadioGroupItem value="one-time" id="one-time" /> {t.oneTime}

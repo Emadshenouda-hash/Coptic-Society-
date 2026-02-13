@@ -9,8 +9,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { useFirestore } from '@/firebase';
-import { collection, serverTimestamp } from 'firebase/firestore';
-import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, serverTimestamp, addDoc } from 'firebase/firestore';
 import {
   Form,
   FormControl,
@@ -20,15 +19,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useLanguage } from '@/context/language-context';
-
-const contactFormSchema = z.object({
-  fullName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  email: z.string().email({ message: 'Please enter a valid email.' }),
-  subject: z.string().min(5, { message: 'Subject must be at least 5 characters.' }),
-  message: z.string().min(10, { message: 'Message must be at least 10 characters.' }),
-});
-
-type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 const translations = {
   en: {
@@ -93,6 +83,8 @@ export function ContactForm() {
     message: z.string().min(10, { message: t.validation.messageMin }),
   });
 
+  type ContactFormValues = z.infer<typeof translatedSchema>;
+
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(translatedSchema),
     defaultValues: {
@@ -123,7 +115,7 @@ export function ContactForm() {
       };
       const contactSubmissionsRef = collection(firestore, 'contact_submissions');
       
-      addDocumentNonBlocking(contactSubmissionsRef, submission);
+      await addDoc(contactSubmissionsRef, submission);
 
       toast({
         title: t.messageSent,

@@ -117,7 +117,7 @@ export default function MembershipPage() {
              <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
               <AccordionItem value="item-1">
                 <AccordionTrigger className="font-headline text-xl">{t.eligibility}</AccordionTrigger>
-                <AccordionContent className="prose max-w-none text-muted-foreground">
+                <AccordionContent className="prose max-w-none text-muted-foreground" dir={direction}>
                   <p>{t.eligibilityIntro}</p>
                   <ul>
                     {t.eligibilityCriteria.map(item => <li key={item}>{item}</li>)}
@@ -126,7 +126,7 @@ export default function MembershipPage() {
               </AccordionItem>
               <AccordionItem value="item-2">
                 <AccordionTrigger className="font-headline text-xl">{t.rightsObligations}</AccordionTrigger>
-                <AccordionContent className="prose max-w-none text-muted-foreground">
+                <AccordionContent className="prose max-w-none text-muted-foreground" dir={direction}>
                   <p>{t.rightsObligationsIntro}</p>
                   <strong>{t.rights}</strong>
                    <ul>
@@ -140,7 +140,7 @@ export default function MembershipPage() {
               </AccordionItem>
               <AccordionItem value="item-3">
                 <AccordionTrigger className="font-headline text-xl">{t.termination}</AccordionTrigger>
-                <AccordionContent className="prose max-w-none text-muted-foreground">
+                <AccordionContent className="prose max-w-none text-muted-foreground" dir={direction}>
                   <p>{t.terminationIntro}</p>
                    <ul>
                     {t.terminationReasons.map(item => <li key={item}>{item}</li>)}

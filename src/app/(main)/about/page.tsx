@@ -54,7 +54,7 @@ export default function AboutPage() {
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-2 items-center">
-           <div className="prose prose-lg max-w-none text-foreground">
+           <div className="prose prose-lg max-w-none text-foreground" dir={direction}>
             <h2 className="font-headline text-primary">{t.mission}</h2>
             <p>
               {t.missionText}

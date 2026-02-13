@@ -104,7 +104,7 @@ export default function GovernancePage() {
                 {t.generalAssembly}
               </CardTitle>
             </CardHeader>
-            <CardContent className="prose max-w-none text-muted-foreground">
+            <CardContent className="prose max-w-none text-muted-foreground" dir={direction}>
               <p>{t.generalAssemblyDesc}</p>
               <strong>{t.keyDuties}</strong>
               <ul>
@@ -119,7 +119,7 @@ export default function GovernancePage() {
                 {t.boardOfDirectors}
               </CardTitle>
             </CardHeader>
-            <CardContent className="prose max-w-none text-muted-foreground">
+            <CardContent className="prose max-w-none text-muted-foreground" dir={direction}>
               <p>{t.boardOfDirectorsDesc}</p>
               <strong>{t.keyDuties}</strong>
               <ul>

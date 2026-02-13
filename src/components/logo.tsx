@@ -23,8 +23,8 @@ export function Logo({ className }: { className?: string }) {
       className={cn(
         'group-hover:text-foreground/80 transition-colors',
         language === 'ar'
-          ? 'font-headline text-2xl font-bold text-primary'
-          : 'text-xs text-muted-foreground'
+          ? 'font-arabic text-2xl font-bold text-primary'
+          : 'text-xs text-muted-foreground font-arabic'
       )}
     >
       الجمعية القبطية الخيرية الكبرى
