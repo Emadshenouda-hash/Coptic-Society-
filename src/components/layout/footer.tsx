@@ -34,7 +34,7 @@ export function Footer() {
 
   return (
     <footer className="bg-secondary text-secondary-foreground" dir={direction}>
-      <div className="container py-12">
+      <div className="container px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4 rtl:text-right">
           <div className="md:col-span-2">
             <Logo />

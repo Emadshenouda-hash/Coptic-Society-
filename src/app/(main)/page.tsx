@@ -62,7 +62,7 @@ export default function HomePage() {
         )}
         <div className="absolute inset-0 bg-primary/70" />
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-primary-foreground">
-          <div className="container">
+          <div className="container px-4 sm:px-6 lg:px-8">
             <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl">
               {t.heroTitle}
             </h1>
@@ -83,7 +83,7 @@ export default function HomePage() {
 
       {/* Programs Section */}
       <section className="py-16 lg:py-24 bg-background">
-        <div className="container">
+        <div className="container px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.corePrograms}</h2>
             <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">
@@ -113,7 +113,7 @@ export default function HomePage() {
 
       {/* Latest News Section */}
       <section className="py-16 lg:py-24 bg-secondary">
-        <div className="container">
+        <div className="container px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.latestNews}</h2>
             <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">

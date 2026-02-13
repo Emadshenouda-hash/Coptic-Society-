@@ -67,7 +67,7 @@ export default function DonatePage() {
 
   return (
     <div className="bg-secondary" dir={direction}>
-      <div className="container py-16 lg:py-24">
+      <div className="container px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div className="space-y-8">
             <div className="space-y-4">
