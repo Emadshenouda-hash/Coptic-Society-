@@ -3,8 +3,8 @@
     {
       "id": "home-hero",
       "description": "A historic, sepia-toned photograph of the Grand Coptic Benevolent Society's original building.",
-      "imageUrl": "/images/gcbs-historic-building.jpg",
-      "imageHint": "historic building society"
+      "imageUrl": "https://images.unsplash.com/photo-1593921858567-915474b34149?q=80&w=1200&fit=crop",
+      "imageHint": "historic building cairo"
     },
     {
       "id": "about-heritage",
