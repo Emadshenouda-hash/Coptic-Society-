@@ -63,6 +63,7 @@ export default function ContactPage() {
                         <div>
                             <h3 className="font-semibold text-lg">{t.headquarters}</h3>
                             <p className="text-muted-foreground">175 Ramsis Street, Cairo, Egypt</p>
+                            <p className="text-muted-foreground">P.O. Box 47, Fagalah, Cairo, Egypt</p>
                         </div>
                     </div>
                      <div className="flex items-start gap-4">
@@ -71,7 +72,8 @@ export default function ContactPage() {
                         </div>
                         <div>
                             <h3 className="font-semibold text-lg">{t.phone}</h3>
-                            <a href="tel:+20212345678" className="text-muted-foreground hover:text-primary transition-colors">+20 2 1234 5678</a>
+                            <a href="tel:+2025912234" className="text-muted-foreground hover:text-primary transition-colors block">+20 2 591 2234</a>
+                            <a href="tel:+2025914047" className="text-muted-foreground hover:text-primary transition-colors block">+20 2 591 4047</a>
                         </div>
                     </div>
                      <div className="flex items-start gap-4">
