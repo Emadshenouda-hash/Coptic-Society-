@@ -1,0 +1,428 @@
+{
+  "entities": {
+    "PageContent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PageContent",
+      "type": "object",
+      "description": "Manages dynamic content for static web pages such as Home, About, Governance descriptions, Membership information, and Bylaws overview. This allows the society to update page text without developer intervention.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PageContent entity."
+        },
+        "pageIdentifier": {
+          "type": "string",
+          "description": "A unique slug or identifier for the page this content belongs to (e.g., 'home', 'about', 'governance', 'membership', 'bylaws-overview')."
+        },
+        "titleEn": {
+          "type": "string",
+          "description": "The title of the page content in English."
+        },
+        "titleAr": {
+          "type": "string",
+          "description": "The title of the page content in Arabic."
+        },
+        "contentEn": {
+          "type": "string",
+          "description": "The main body content of the page in English, potentially rich text."
+        },
+        "contentAr": {
+          "type": "string",
+          "description": "The main body content of the page in Arabic, potentially rich text."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "Timestamp indicating when the page content was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "pageIdentifier",
+        "titleEn",
+        "titleAr",
+        "contentEn",
+        "contentAr",
+        "lastUpdated"
+      ]
+    },
+    "Program": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Program",
+      "type": "object",
+      "description": "Details various charitable programs and initiatives offered by the Grand Coptic Benevolent Society, such as Social Assistance, Healthcare, Education, etc.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Program entity."
+        },
+        "nameEn": {
+          "type": "string",
+          "description": "The name of the program in English."
+        },
+        "nameAr": {
+          "type": "string",
+          "description": "The name of the program in Arabic."
+        },
+        "shortDescriptionEn": {
+          "type": "string",
+          "description": "A brief summary of the program in English, suitable for listings."
+        },
+        "shortDescriptionAr": {
+          "type": "string",
+          "description": "A brief summary of the program in Arabic, suitable for listings."
+        },
+        "fullDescriptionEn": {
+          "type": "string",
+          "description": "The detailed description of the program in English."
+        },
+        "fullDescriptionAr": {
+          "type": "string",
+          "description": "The detailed description of the program in Arabic."
+        },
+        "iconName": {
+          "type": "string",
+          "description": "The name of a universal icon representing this program area (e.g., 'healthcare-icon', 'education-icon')."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL to a featured image associated with the program.",
+          "format": "uri"
+        },
+        "galleryImageUrls": {
+          "type": "array",
+          "description": "An array of URLs to images for the program's photo gallery.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "nameEn",
+        "nameAr",
+        "shortDescriptionEn",
+        "shortDescriptionAr",
+        "fullDescriptionEn",
+        "fullDescriptionAr",
+        "iconName",
+        "imageUrl"
+      ]
+    },
+    "BoardMember": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BoardMember",
+      "type": "object",
+      "description": "Stores information about the members of the Society's Board of Directors, who are elected every four years.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the BoardMember entity."
+        },
+        "nameEn": {
+          "type": "string",
+          "description": "The full name of the board member in English."
+        },
+        "nameAr": {
+          "type": "string",
+          "description": "The full name of the board member in Arabic."
+        },
+        "titleEn": {
+          "type": "string",
+          "description": "The official title or position of the board member in English (e.g., 'Chairman', 'Treasurer')."
+        },
+        "titleAr": {
+          "type": "string",
+          "description": "The official title or position of the board member in Arabic."
+        },
+        "bioEn": {
+          "type": "string",
+          "description": "A short biography or description of the board member's role and contributions in English."
+        },
+        "bioAr": {
+          "type": "string",
+          "description": "A short biography or description of the board member's role and contributions in Arabic."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL to the board member's photograph.",
+          "format": "uri"
+        },
+        "termStartDate": {
+          "type": "string",
+          "description": "The start date of the board member's current term.",
+          "format": "date"
+        },
+        "termEndDate": {
+          "type": "string",
+          "description": "The end date of the board member's current term.",
+          "format": "date"
+        }
+      },
+      "required": [
+        "id",
+        "nameEn",
+        "nameAr",
+        "titleEn",
+        "titleAr",
+        "imageUrl",
+        "termStartDate",
+        "termEndDate"
+      ]
+    },
+    "Post": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Post",
+      "type": "object",
+      "description": "Represents dynamic content such as news articles, event announcements, and general updates for the 'News or Updates' page.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Post entity."
+        },
+        "titleEn": {
+          "type": "string",
+          "description": "The title of the news/event post in English."
+        },
+        "titleAr": {
+          "type": "string",
+          "description": "The title of the news/event post in Arabic."
+        },
+        "summaryEn": {
+          "type": "string",
+          "description": "A short summary of the post in English, suitable for display in a list or preview."
+        },
+        "summaryAr": {
+          "type": "string",
+          "description": "A short summary of the post in Arabic, suitable for display in a list or preview."
+        },
+        "contentEn": {
+          "type": "string",
+          "description": "The full detailed content of the post in English, potentially rich text."
+        },
+        "contentAr": {
+          "type": "string",
+          "description": "The full detailed content of the post in Arabic, potentially rich text."
+        },
+        "publishDate": {
+          "type": "string",
+          "description": "The date and time when the post was published.",
+          "format": "date-time"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL to a featured image associated with the post.",
+          "format": "uri"
+        },
+        "tags": {
+          "type": "array",
+          "description": "An array of keywords or categories to help organize and filter posts (e.g., 'event', 'news', 'announcement').",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "titleEn",
+        "titleAr",
+        "summaryEn",
+        "summaryAr",
+        "contentEn",
+        "contentAr",
+        "publishDate",
+        "imageUrl"
+      ]
+    },
+    "ContactSubmission": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ContactSubmission",
+      "type": "object",
+      "description": "Stores submissions received through the website's contact form, facilitating communication and follow-up.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ContactSubmission entity."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the person submitting the contact form."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the sender for follow-up.",
+          "format": "email"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The optional phone number of the sender."
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject line of the inquiry."
+        },
+        "message": {
+          "type": "string",
+          "description": "The main message content from the sender."
+        },
+        "submissionDate": {
+          "type": "string",
+          "description": "The date and time when the contact form was submitted.",
+          "format": "date-time"
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "A flag indicating whether the submission has been reviewed by staff."
+        }
+      },
+      "required": [
+        "id",
+        "fullName",
+        "email",
+        "subject",
+        "message",
+        "submissionDate",
+        "isRead"
+      ]
+    },
+    "Document": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Document",
+      "type": "object",
+      "description": "Stores official documents, such as bylaws, and their AI-generated summaries for quick comprehension.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Document entity."
+        },
+        "titleEn": {
+          "type": "string",
+          "description": "The title of the document in English."
+        },
+        "titleAr": {
+          "type": "string",
+          "description": "The title of the document in Arabic."
+        },
+        "descriptionEn": {
+          "type": "string",
+          "description": "A short description or overview of the document's content in English."
+        },
+        "descriptionAr": {
+          "type": "string",
+          "description": "A short description or overview of the document's content in Arabic."
+        },
+        "documentUrl": {
+          "type": "string",
+          "description": "URL to the actual document file (e.g., PDF) for download.",
+          "format": "uri"
+        },
+        "summaryEn": {
+          "type": "string",
+          "description": "An AI-generated concise summary of the document's content in English."
+        },
+        "summaryAr": {
+          "type": "string",
+          "description": "An AI-generated concise summary of the document's content in Arabic."
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "The date and time when the document was uploaded.",
+          "format": "date-time"
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the document (e.g., 'Bylaws', 'Annual Report', 'Policy')."
+        }
+      },
+      "required": [
+        "id",
+        "titleEn",
+        "titleAr",
+        "documentUrl",
+        "uploadDate",
+        "category"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/page_content/{pageContentId}",
+        "definition": {
+          "entityName": "PageContent",
+          "schema": {
+            "$ref": "#/backend/entities/PageContent"
+          },
+          "description": "Stores dynamic content for static web pages (e.g., Home, About, Governance). All documents in this collection are publicly readable and can only be written/updated by administrators. The 'pageIdentifier' field serves as the document ID. This structure enables simple 'allow read: if true;' rules and supports QAPs."
+        }
+      },
+      {
+        "path": "/programs/{programId}",
+        "definition": {
+          "entityName": "Program",
+          "schema": {
+            "$ref": "#/backend/entities/Program"
+          },
+          "description": "Details various charitable programs. All documents in this collection are publicly readable and can only be written/updated by administrators. This structure ensures homogeneous security posture, enabling simple read rules and supporting QAPs."
+        }
+      },
+      {
+        "path": "/board_members/{boardMemberId}",
+        "definition": {
+          "entityName": "BoardMember",
+          "schema": {
+            "$ref": "#/backend/entities/BoardMember"
+          },
+          "description": "Stores information about the Society's Board of Directors. All documents in this collection are publicly readable and can only be written/updated by administrators. This structure ensures homogeneous security posture, enabling simple read rules and supporting QAPs."
+        }
+      },
+      {
+        "path": "/posts/{postId}",
+        "definition": {
+          "entityName": "Post",
+          "schema": {
+            "$ref": "#/backend/entities/Post"
+          },
+          "description": "Represents dynamic content such as news articles, event announcements, and general updates. All documents in this collection are considered 'published' and are publicly readable. Only administrators can create, update, or delete posts. This structure enforces a homogeneous security posture for public content and supports QAPs."
+        }
+      },
+      {
+        "path": "/contact_submissions/{submissionId}",
+        "definition": {
+          "entityName": "ContactSubmission",
+          "schema": {
+            "$ref": "#/backend/entities/ContactSubmission"
+          },
+          "description": "Stores submissions received through the website's contact form. Any user (authenticated or unauthenticated) can create a new submission. Only authenticated users with an 'admin' role can read, list, or update these submissions. This collection maintains a homogeneous security posture for submissions, supporting QAPs for admin access."
+        }
+      },
+      {
+        "path": "/documents/{documentId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Stores official documents (e.g., bylaws, annual reports) and their AI-generated summaries. All documents in this collection are publicly readable and can only be written/updated by administrators. This structure ensures homogeneous security posture, enabling simple read rules and supporting QAPs."
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/user"
+          },
+          "description": "Dedicated collection for identifying administrators. The existence of a document at this path signifies that the '{userId}' (request.auth.uid) is an administrator. This is used for database-backed access control (DBAC) for global roles, adhering to the 'existence over content' principle. Read access to this collection is restricted to administrators or the user themselves (for verification purposes), with write access primarily managed via backend functions."
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to be secure, scalable, and debuggable by strictly adhering to the core design principles and strategy mandates. \n\n**Authorization Independence (CRITICAL) and QAPs (Rules are not Filters):**\n\n1.  **Homogeneous Security Posture:** Each top-level collection (`/page_content`, `/programs`, `/board_members`, `/posts`, `/documents`, `/contact_submissions`, `/roles_admin`) is designed to contain documents that share the exact same security requirements. This radical consistency is the primary mechanism for achieving Authorization Independence.\n    *   For collections like `/page_content`, `/programs`, `/board_members`, `/posts`, and `/documents`, all documents are intended for public consumption (read-only for all users) but can only be modified by authenticated administrators. Because all documents within these collections have the same public read access, a `list` operation from any client will return all documents, and the security rules can be a simple `allow read: if true;`. This directly supports QAPs as the rules are not filtering; they are simply granting full read access to the entire collection.\n    *   For `/contact_submissions`, all users (even unauthenticated) can create new submissions. However, only authenticated administrators can read or list these submissions. This homogeneous security posture within the collection (all can create, only admins can read/list) means a `list` query from an admin will succeed, and one from a non-admin will fail, upholding QAPs without complex in-rule filtering.\n\n2.  **No Hierarchical Data Dependencies:** Crucially, there are no subcollections whose authorization depends on attributes of their parent documents. All entities are stored in top-level collections. This eliminates the need for `get()` calls in security rules to check parent data, preventing issues with atomic operations (transactions/batches) and making rules easier to debug and reason about.\n\n3.  **DBAC (Database Access Control) for Global Roles:** Administrator roles are implemented using the 'existence over content' pattern in the `/roles_admin/{userId}` collection. An administrator's privilege is determined by the *existence* of a document with their UID in this collection. While checking for this existence in a security rule (e.g., `exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))`) is a `get()` operation, it is a global, fixed lookup for a role, not a dependency on variable parent *data* within a content hierarchy. This is a widely accepted and secure pattern for global roles and does not violate the spirit of Authorization Independence as defined, which primarily targets hierarchical data dependencies.\n\nBy ensuring structural segregation, consistent security postures within collections, and avoiding hierarchical data dependencies, the design ensures that security rules are straightforward, explicit, and easy to audit, minimizing the risk of misconfiguration and enhancing debuggability. QAPs are naturally supported because the data is structured such that what can be read via a `list` operation is precisely what clients are authorized to see, without implicit filtering by rules."
+  }
+}

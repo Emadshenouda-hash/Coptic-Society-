@@ -1,0 +1,160 @@
+/**
+ * Core Philosophy:
+ * This ruleset implements a dual-access security model tailored for a public-facing website with an administrative backend.
+ * 1. Public Content: Most data collections (like posts, programs, and board members) are publicly readable by anyone, including unauthenticated visitors.
+ * 2. Administrative Control: All write operations (create, update, delete) on public content are strictly restricted to authenticated users with an 'admin' role.
+ * 3. Protected Submissions: The 'contact_submissions' collection is write-only for the public, allowing anyone to submit a form, but read and management access is restricted to administrators.
+ *
+ * Data Structure:
+ * The data model is flat, with all entities residing in top-level collections. This design avoids complex, nested security rules and ensures that queries are efficient and secure. There are no user-specific subcollections.
+ *
+ * Key Security Decisions:
+ * - Administrator roles are managed via a dedicated `/roles_admin/{userId}` collection. A user is considered an admin if a document with their UID exists in this collection. This is a secure and performant Database Access Control (DBAC) pattern.
+ * - Public read access is intentionally broad (`allow read: if true;`) on content collections to serve the website, while writes are locked down.
+ * - The contact form submission path (`/contact_submissions`) is a secure "dropbox," allowing public creation but preventing anyone other than an admin from reading the submitted data.
+ * - Listing of users or administrators is disallowed for non-admins to protect user privacy.
+ *
+ * Denormalization for Authorization:
+ * This ruleset uses the `/roles_admin` collection as a form of denormalization for authorization. Instead of checking a role field on a user profile, we check for the existence of a document. This provides a fast, dedicated lookup for the most critical authorization check (isAdmin) without needing to access other parts of the database.
+ *
+ * Structural Segregation:
+ * The design uses separate top-level collections for data with different security needs. For example, public-facing `/posts` are separate from the private `/contact_submissions`. This segregation allows for simple, powerful, and highly performant rules for each collection without needing to filter documents based on flags.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------------
+    // Helper Functions
+    // ----------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the requesting user's UID matches the provided userId.
+     * Used to verify resource ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if the requesting user has an administrator role.
+     * Admin status is determined by the existence of a document in the
+     * /roles_admin collection corresponding to the user's UID.
+     */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    // ----------------------------------------------------------------------
+    // Collection Rules
+    // ----------------------------------------------------------------------
+
+    /**
+     * @description Manages dynamic content for static web pages (e.g., Home, About).
+     * @path /page_content/{pageContentId}
+     * @allow (get) Any user, signed in or not, can read a specific page's content.
+     * @allow (create) An administrator can create a new page content document.
+     * @deny (update) A regular signed-in user cannot update a page's content.
+     * @principle Public Read with Admin-Only Writes. Ensures website content is accessible to all but modifiable only by authorized personnel.
+     */
+    match /page_content/{pageContentId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Manages details about the society's charitable programs.
+     * @path /programs/{programId}
+     * @allow (list) Any visitor can list all available programs.
+     * @allow (update) An administrator can update the details of an existing program.
+     * @deny (create) A non-administrative user cannot create a new program.
+     * @principle Public Read with Admin-Only Writes. Allows public discovery of programs while securing content management.
+     */
+    match /programs/{programId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Manages information about the Board of Directors.
+     * @path /board_members/{boardMemberId}
+     * @allow (get) Any user can view the profile of a board member.
+     * @allow (delete) An administrator can remove a board member's profile.
+     * @deny (update) An anonymous user cannot modify a board member's profile.
+     * @principle Public Read with Admin-Only Writes. Provides transparency about leadership while maintaining data integrity.
+     */
+    match /board_members/{boardMemberId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Manages news articles, events, and other dynamic posts.
+     * @path /posts/{postId}
+     * @allow (list) Any visitor can see the list of all published posts.
+     * @allow (create) An administrator can publish a new post.
+     * @deny (delete) A regular authenticated user cannot delete a post.
+     * @principle Public Read with Admin-Only Writes. Ensures news and updates are widely available but centrally controlled.
+     */
+    match /posts/{postId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description A secure dropbox for contact form submissions.
+     * @path /contact_submissions/{submissionId}
+     * @allow (create) Any user, including anonymous visitors, can submit the contact form.
+     * @allow (get) An administrator can read a specific submission.
+     * @deny (list) A non-administrative user cannot list all submissions.
+     * @deny (get) An anonymous user cannot read a submission, even if they know its ID.
+     * @principle Public Create, Admin-Only Read. Allows open submission while protecting the privacy of the submitted information.
+     */
+    match /contact_submissions/{submissionId} {
+      allow get, list: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Manages official documents like bylaws and annual reports.
+     * @path /documents/{documentId}
+     * @allow (get) Any user can read and access a specific document.
+     * @allow (create) An administrator can upload a new document.
+     * @deny (update) A standard user cannot modify an existing document.
+     * @principle Public Read with Admin-Only Writes. Facilitates public access to important documents while ensuring their authenticity.
+     */
+    match /documents/{documentId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
+     * @description Manages administrator roles using a DBAC (Database Access Control) pattern.
+     * @path /roles_admin/{userId}
+     * @allow (get) An administrator can check the role status of another user.
+     * @allow (get) A user can check their own role status (e.g., for UI changes). Auth UID must match {userId}.
+     * @deny (list) A non-admin user cannot list all administrators.
+     * @deny (create) A standard user cannot grant themselves or others admin privileges.
+     * @principle Role-Based Access Control. Secures the list of admins and prevents privilege escalation.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isAdmin() || isOwner(userId);
+      allow list: if isAdmin();
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin() && resource != null;
+    }
+  }
+}
