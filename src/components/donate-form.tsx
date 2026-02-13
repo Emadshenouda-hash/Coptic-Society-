@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { DollarSign, User, CreditCard, Gift, CheckCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { DollarSign, User, CreditCard, Gift, CheckCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -9,6 +12,11 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Progress } from './ui/progress';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, serverTimestamp } from 'firebase/firestore';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { useToast } from '@/hooks/use-toast';
 
 const steps = [
   { id: 1, name: 'Amount', icon: DollarSign },
@@ -19,14 +27,32 @@ const steps = [
 
 const donationAmounts = [25, 50, 100, 250];
 
+const donorDetailsSchema = z.object({
+  donorName: z.string().min(2, { message: 'Full name is required.' }),
+  donorEmail: z.string().email({ message: 'A valid email is required.' }),
+});
+
+type DonorDetailsValues = z.infer<typeof donorDetailsSchema>;
+
 export function DonateForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [amount, setAmount] = useState(50);
   const [customAmount, setCustomAmount] = useState('');
   const [isRecurring, setIsRecurring] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const firestore = useFirestore();
+  const { user } = useUser();
+  const { toast } = useToast();
 
-  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, 4));
-  const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const form = useForm<DonorDetailsValues>({
+    resolver: zodResolver(donorDetailsSchema),
+    defaultValues: {
+      donorName: '',
+      donorEmail: '',
+    },
+  });
+
   const handleAmountSelect = (selectedAmount: number) => {
     setAmount(selectedAmount);
     setCustomAmount('');
@@ -35,9 +61,56 @@ export function DonateForm() {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
       setCustomAmount(value);
-      setAmount(Number(value));
+      setAmount(Number(value) || 0);
     }
   }
+
+  const handleDetailsSubmit = () => {
+    setCurrentStep(3);
+  };
+  
+  const handleConfirmDonation = async () => {
+     if (!firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'An error occurred',
+        description: 'Database service is not available.',
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    const donorDetails = form.getValues();
+
+    try {
+      const donationData = {
+        amount: amount,
+        isRecurring: isRecurring,
+        donorName: donorDetails.donorName,
+        donorEmail: donorDetails.donorEmail,
+        donationDate: serverTimestamp(),
+        userId: user ? user.uid : null,
+      };
+
+      const donationsRef = collection(firestore, 'donations');
+      addDocumentNonBlocking(donationsRef, donationData);
+      
+      setCurrentStep(4);
+
+    } catch (error) {
+       console.error('Error submitting donation:', error);
+       toast({
+        variant: 'destructive',
+        title: 'An error occurred',
+        description: 'Could not process your donation. Please try again later.',
+      });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+  
+  const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   const progress = (currentStep / steps.length) * 100;
 
@@ -71,31 +144,45 @@ export function DonateForm() {
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input type="text" placeholder="Or enter custom amount" value={customAmount} onChange={handleCustomAmountChange} className="pl-10 text-lg h-12" />
             </div>
-            <Button size="lg" className="w-full" onClick={handleNext}>Continue</Button>
+            <Button size="lg" className="w-full" onClick={() => setCurrentStep(2)} disabled={amount <= 0}>Continue</Button>
           </div>
         )}
         {currentStep === 2 && (
-          <div className="space-y-6">
-            <h3 className="font-headline text-xl">2. Your Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" placeholder="John" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" placeholder="Doe" />
-                </div>
-            </div>
-             <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" placeholder="john.doe@example.com" />
-            </div>
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={handlePrev}>Back</Button>
-              <Button onClick={handleNext}>Proceed to Payment</Button>
-            </div>
-          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleDetailsSubmit)} className="space-y-6">
+              <h3 className="font-headline text-xl">2. Your Details</h3>
+               <FormField
+                  control={form.control}
+                  name="donorName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="donorEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="john.doe@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={handlePrev}>Back</Button>
+                <Button type="submit">Proceed to Payment</Button>
+              </div>
+            </form>
+          </Form>
         )}
         {currentStep === 3 && (
            <div className="space-y-6">
@@ -117,7 +204,9 @@ export function DonateForm() {
             </div>
              <div className="flex justify-between">
               <Button variant="outline" onClick={handlePrev}>Back</Button>
-              <Button onClick={handleNext} className="bg-accent text-accent-foreground hover:bg-accent/90">Confirm Donation of ${amount}</Button>
+              <Button onClick={handleConfirmDonation} className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={isSubmitting}>
+                {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Processing...</> : `Confirm Donation of $${amount}`}
+              </Button>
             </div>
           </div>
         )}
@@ -126,12 +215,14 @@ export function DonateForm() {
             <CheckCircle className="h-20 w-20 text-green-500" />
             <h3 className="font-headline text-2xl text-primary">Thank You For Your Generosity!</h3>
             <p className="text-muted-foreground max-w-md">
-                Your ${amount} {isRecurring ? 'monthly' : ''} donation has been processed successfully. A receipt has been sent to your email. Your support helps us continue our vital work in the community.
+                Your ${amount} {isRecurring ? 'monthly' : ''} donation has been processed. A receipt has been sent to your email. Your support helps us continue our vital work in the community.
             </p>
-            <Button variant="outline" onClick={() => setCurrentStep(1)}>Make Another Donation</Button>
+            <Button variant="outline" onClick={() => { setCurrentStep(1); form.reset(); }}>Make Another Donation</Button>
           </div>
         )}
       </CardContent>
     </Card>
   );
 }
+
+    

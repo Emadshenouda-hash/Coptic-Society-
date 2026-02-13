@@ -3,7 +3,7 @@
  * This ruleset implements a dual-access security model tailored for a public-facing website with an administrative backend.
  * 1. Public Content: Most data collections (like posts, programs, and board members) are publicly readable by anyone, including unauthenticated visitors.
  * 2. Administrative Control: All write operations (create, update, delete) on public content are strictly restricted to authenticated users with an 'admin' role.
- * 3. Protected Submissions: The 'contact_submissions' collection is write-only for the public, allowing anyone to submit a form, but read and management access is restricted to administrators.
+ * 3. Protected Submissions: The 'contact_submissions' and 'donations' collections are write-only for the public, allowing anyone to submit, but read and management access is restricted to administrators.
  *
  * Data Structure:
  * The data model is flat, with all entities residing in top-level collections. This design avoids complex, nested security rules and ensures that queries are efficient and secure. There are no user-specific subcollections.
@@ -11,14 +11,14 @@
  * Key Security Decisions:
  * - Administrator roles are managed via a dedicated `/roles_admin/{userId}` collection. A user is considered an admin if a document with their UID exists in this collection. This is a secure and performant Database Access Control (DBAC) pattern.
  * - Public read access is intentionally broad (`allow read: if true;`) on content collections to serve the website, while writes are locked down.
- * - The contact form submission path (`/contact_submissions`) is a secure "dropbox," allowing public creation but preventing anyone other than an admin from reading the submitted data.
+ * - The contact form and donation paths are secure "dropboxes," allowing public creation but preventing anyone other than an admin from reading the submitted data.
  * - Listing of users or administrators is disallowed for non-admins to protect user privacy.
  *
  * Denormalization for Authorization:
  * This ruleset uses the `/roles_admin` collection as a form of denormalization for authorization. Instead of checking a role field on a user profile, we check for the existence of a document. This provides a fast, dedicated lookup for the most critical authorization check (isAdmin) without needing to access other parts of the database.
  *
  * Structural Segregation:
- * The design uses separate top-level collections for data with different security needs. For example, public-facing `/posts` are separate from the private `/contact_submissions`. This segregation allows for simple, powerful, and highly performant rules for each collection without needing to filter documents based on flags.
+ * The design uses separate top-level collections for data with different security needs. For example, public-facing `/posts` are separate from the private `/contact_submissions` and `/donations`. This segregation allows for simple, powerful, and highly performant rules for each collection without needing to filter documents based on flags.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -128,6 +128,20 @@ service cloud.firestore {
     }
 
     /**
+     * @description A secure dropbox for donation records.
+     * @path /donations/{donationId}
+     * @allow (create) Any user can submit a donation.
+     * @allow (list) Only administrators can view the list of donations.
+     * @deny (get) A non-admin user cannot read individual donation records.
+     * @principle Public Create, Admin-Only Read. Protects donor privacy while allowing anyone to donate.
+     */
+    match /donations/{donationId} {
+      allow get, list: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin() && resource != null;
+    }
+
+    /**
      * @description Manages official documents like bylaws and annual reports.
      * @path /documents/{documentId}
      * @allow (get) Any user can read and access a specific document.
@@ -158,3 +172,5 @@ service cloud.firestore {
     }
   }
 }
+
+    
