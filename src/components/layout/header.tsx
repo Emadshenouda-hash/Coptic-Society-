@@ -9,20 +9,28 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Logo } from '@/components/logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { useLanguage } from '@/context/language-context';
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/programs', label: 'Programs' },
-  { href: '/governance', label: 'Governance' },
-  { href: '/membership', label: 'Membership' },
-  { href: '/bylaws', label: 'Bylaws' },
-  { href: '/news', label: 'News' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/', en: 'Home', ar: 'الرئيسية' },
+  { href: '/about', en: 'About', ar: 'من نحن' },
+  { href: '/programs', en: 'Programs', ar: 'برامجنا' },
+  { href: '/governance', en: 'Governance', ar: 'الحوكمة' },
+  { href: '/membership', en: 'Membership', ar: 'العضوية' },
+  { href: '/bylaws', en: 'Bylaws', ar: 'النظام الأساسي' },
+  { href: '/news', en: 'News', ar: 'الأخبار' },
+  { href: '/contact', en: 'Contact', ar: 'اتصل بنا' },
 ];
+
+const donateButtonTranslations = {
+  en: 'Donate',
+  ar: 'تبرع',
+};
+
 
 export function Header() {
   const pathname = usePathname();
+  const { language } = useLanguage();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
@@ -39,7 +47,7 @@ export function Header() {
                   pathname === link.href ? 'text-primary' : 'text-muted-foreground'
                 )}
               >
-                {link.label}
+                {language === 'ar' ? link.ar : link.en}
               </Link>
             ))}
           </nav>
@@ -48,7 +56,7 @@ export function Header() {
         <div className="hidden items-center gap-2 md:flex">
           <LanguageSwitcher />
           <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/donate">Donate</Link>
+            <Link href="/donate">{donateButtonTranslations[language]}</Link>
           </Button>
         </div>
 
@@ -60,12 +68,12 @@ export function Header() {
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
+            <SheetContent side={language === 'ar' ? 'right' : 'left'}>
               <div className="flex h-full flex-col">
                 <div className="border-b p-4">
                   <Logo />
                 </div>
-                <nav className="flex flex-col gap-4 p-4">
+                <nav className="flex flex-col gap-4 p-4 rtl:text-right">
                   {navLinks.map((link) => (
                     <Link
                       key={link.href}
@@ -77,13 +85,13 @@ export function Header() {
                           : 'text-muted-foreground'
                       )}
                     >
-                      {link.label}
+                      {language === 'ar' ? link.ar : link.en}
                     </Link>
                   ))}
                 </nav>
                 <div className="mt-auto flex flex-col gap-4 border-t p-4">
                   <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                    <Link href="/donate">Donate</Link>
+                    <Link href="/donate">{donateButtonTranslations[language]}</Link>
                   </Button>
                   <LanguageSwitcher />
                 </div>

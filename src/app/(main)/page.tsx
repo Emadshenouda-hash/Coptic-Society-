@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -5,11 +7,44 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { programs, newsArticles } from '@/lib/content';
+import { useLanguage } from '@/context/language-context';
+
+const translations = {
+  en: {
+    heroTitle: 'Serving Humanity Since 1881',
+    heroSubtitle: 'Enhancing social justice and dignity for needy families of all backgrounds across Egypt.',
+    donateNow: 'Donate Now',
+    learnMore: 'Learn More',
+    corePrograms: 'Our Core Programs',
+    programsSubtitle: 'From healthcare to education, we run diverse programs to uplift communities and empower individuals.',
+    readMore: 'Read More',
+    latestNews: 'Latest News & Updates',
+    newsSubtitle: 'Stay informed about our latest activities, events, and success stories.',
+    readFullStory: 'Read Full Story',
+    viewAllNews: 'View All News',
+  },
+  ar: {
+    heroTitle: 'نخدم الإنسانية منذ ۱۸۸۱',
+    heroSubtitle: 'تعزيز العدالة الاجتماعية والكرامة للأسر المحتاجة من جميع الخلفيات في جميع أنحاء مصر.',
+    donateNow: 'تبرع الآن',
+    learnMore: 'اعرف المزيد',
+    corePrograms: 'برامجنا الأساسية',
+    programsSubtitle: 'من الرعاية الصحية إلى التعليم، ندير برامج متنوعة للنهوض بالمجتمعات وتمكين الأفراد.',
+    readMore: 'اقرأ المزيد',
+    latestNews: 'آخر الأخبار والمستجدات',
+    newsSubtitle: 'ابق على اطلاع بآخر أنشطتنا وفعالياتنا وقصص نجاحنا.',
+    readFullStory: 'اقرأ القصة كاملة',
+    viewAllNews: 'عرض كل الأخبار',
+  }
+};
+
 
 export default function HomePage() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'home-hero');
   const programIcons = programs.slice(0, 6);
   const recentNews = newsArticles.slice(0, 3);
+  const { language } = useLanguage();
+  const t = translations[language];
 
   return (
     <div className="flex-1">
@@ -29,17 +64,17 @@ export default function HomePage() {
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-primary-foreground">
           <div className="container">
             <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl">
-              Serving Humanity Since 1881
+              {t.heroTitle}
             </h1>
             <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl">
-              Enhancing social justice and dignity for needy families of all backgrounds across Egypt.
+              {t.heroSubtitle}
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link href="/donate">Donate Now</Link>
+                <Link href="/donate">{t.donateNow}</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="border-primary-foreground text-primary-foreground bg-transparent hover:bg-primary-foreground hover:text-primary">
-                <Link href="/about">Learn More</Link>
+                <Link href="/about">{t.learnMore}</Link>
               </Button>
             </div>
           </div>
@@ -50,9 +85,9 @@ export default function HomePage() {
       <section className="py-16 lg:py-24 bg-background">
         <div className="container">
           <div className="text-center">
-            <h2 className="font-headline text-3xl md:text-4xl text-primary">Our Core Programs</h2>
+            <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.corePrograms}</h2>
             <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">
-              From healthcare to education, we run diverse programs to uplift communities and empower individuals.
+              {t.programsSubtitle}
             </p>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -67,7 +102,7 @@ export default function HomePage() {
                 <CardContent>
                   <p className="text-muted-foreground text-sm">{program.description.substring(0, 100)}...</p>
                   <Button variant="link" asChild className="mt-4 text-accent hover:text-accent/80">
-                    <Link href={`/programs#${program.id}`}>Read More <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                    <Link href={`/programs#${program.id}`}>{t.readMore} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -80,9 +115,9 @@ export default function HomePage() {
       <section className="py-16 lg:py-24 bg-secondary">
         <div className="container">
           <div className="text-center">
-            <h2 className="font-headline text-3xl md:text-4xl text-primary">Latest News & Updates</h2>
+            <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.latestNews}</h2>
             <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">
-              Stay informed about our latest activities, events, and success stories.
+              {t.newsSubtitle}
             </p>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -110,7 +145,7 @@ export default function HomePage() {
                   </CardContent>
                   <div className="p-6 pt-0">
                     <Button variant="link" asChild className="p-0 text-accent hover:text-accent/80">
-                      <Link href={`/news#${article.slug}`}>Read Full Story <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                      <Link href={`/news#${article.slug}`}>{t.readFullStory} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
                     </Button>
                   </div>
                 </Card>
@@ -119,7 +154,7 @@ export default function HomePage() {
           </div>
            <div className="text-center mt-12">
             <Button asChild size="lg">
-              <Link href="/news">View All News</Link>
+              <Link href="/news">{t.viewAllNews}</Link>
             </Button>
           </div>
         </div>
