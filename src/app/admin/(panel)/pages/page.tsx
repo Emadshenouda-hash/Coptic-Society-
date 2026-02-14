@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,6 +10,17 @@ import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // Define the type based on your backend.json entity
 interface PageContent {
@@ -26,6 +37,8 @@ interface PageContent {
 export default function AdminPagesPage() {
   const firestore = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
+  const [pageToDelete, setPageToDelete] = useState<PageContent | null>(null);
 
   const pagesCollectionRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -40,9 +53,24 @@ export default function AdminPagesPage() {
     alert(`Edit page with ID: ${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    // This will be implemented later
-    alert(`Delete page with ID: ${id}`);
+  const handleDelete = async () => {
+    if (!pageToDelete || !firestore) return;
+    const docRef = doc(firestore, 'page_content', pageToDelete.id);
+    try {
+      await deleteDoc(docRef);
+      toast({
+        title: "Page Deleted",
+        description: `The page "${pageToDelete.titleEn}" has been deleted.`,
+      });
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: "Delete Failed",
+        description: "Could not delete the page. Please try again.",
+      });
+    } finally {
+      setPageToDelete(null);
+    }
   };
   
   const formatDate = (timestamp: any) => {
@@ -104,7 +132,7 @@ export default function AdminPagesPage() {
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(page.id)} aria-label="Edit">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(page.id)} aria-label="Delete">
+                        <Button variant="ghost" size="icon" onClick={() => setPageToDelete(page)} aria-label="Delete">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </TableCell>
@@ -122,6 +150,21 @@ export default function AdminPagesPage() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!pageToDelete} onOpenChange={(isOpen) => !isOpen && setPageToDelete(null)}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete this page content?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the content for "{pageToDelete?.titleEn}".
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,14 +1,25 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface Program {
   id: string;
@@ -20,6 +31,8 @@ interface Program {
 export default function AdminProgramsPage() {
   const firestore = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
+  const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
 
   const programsCollectionRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -32,8 +45,24 @@ export default function AdminProgramsPage() {
     alert(`Edit program with ID: ${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    alert(`Delete program with ID: ${id}`);
+  const handleDelete = async () => {
+    if (!programToDelete || !firestore) return;
+    const docRef = doc(firestore, 'programs', programToDelete.id);
+    try {
+      await deleteDoc(docRef);
+      toast({
+        title: "Program Deleted",
+        description: `The program "${programToDelete.nameEn}" has been deleted.`,
+      });
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: "Delete Failed",
+        description: "Could not delete the program. Please try again.",
+      });
+    } finally {
+      setProgramToDelete(null);
+    }
   };
 
   return (
@@ -80,7 +109,7 @@ export default function AdminProgramsPage() {
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(program.id)} aria-label="Edit">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(program.id)} aria-label="Delete">
+                        <Button variant="ghost" size="icon" onClick={() => setProgramToDelete(program)} aria-label="Delete">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </TableCell>
@@ -98,6 +127,21 @@ export default function AdminProgramsPage() {
           )}
         </CardContent>
       </Card>
+      
+      <AlertDialog open={!!programToDelete} onOpenChange={(isOpen) => !isOpen && setProgramToDelete(null)}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete this program?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the program titled "{programToDelete?.nameEn}".
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

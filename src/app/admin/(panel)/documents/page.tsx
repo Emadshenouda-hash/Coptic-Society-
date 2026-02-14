@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,6 +11,17 @@ import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface Document {
   id: string;
@@ -27,6 +38,8 @@ interface Document {
 export default function AdminDocumentsPage() {
   const firestore = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
+  const [docToDelete, setDocToDelete] = useState<Document | null>(null);
 
   const documentsCollectionRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -39,8 +52,24 @@ export default function AdminDocumentsPage() {
     alert(`Edit document with ID: ${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    alert(`Delete document with ID: ${id}`);
+  const handleDelete = async () => {
+    if (!docToDelete || !firestore) return;
+    const docRef = doc(firestore, 'documents', docToDelete.id);
+    try {
+      await deleteDoc(docRef);
+      toast({
+        title: "Document Deleted",
+        description: `The document "${docToDelete.titleEn}" has been deleted.`,
+      });
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: "Delete Failed",
+        description: "Could not delete the document. Please try again.",
+      });
+    } finally {
+      setDocToDelete(null);
+    }
   };
 
   const formatDate = (timestamp: any) => {
@@ -105,7 +134,7 @@ export default function AdminDocumentsPage() {
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(doc.id)} aria-label="Edit">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(doc.id)} aria-label="Delete">
+                        <Button variant="ghost" size="icon" onClick={() => setDocToDelete(doc)} aria-label="Delete">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </TableCell>
@@ -123,6 +152,21 @@ export default function AdminDocumentsPage() {
           )}
         </CardContent>
       </Card>
+      
+      <AlertDialog open={!!docToDelete} onOpenChange={(isOpen) => !isOpen && setDocToDelete(null)}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete this document?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the document titled "{docToDelete?.titleEn}".
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,14 +1,25 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface BoardMember {
   id: string;
@@ -23,6 +34,8 @@ interface BoardMember {
 export default function AdminBoardMembersPage() {
   const firestore = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
+  const [memberToDelete, setMemberToDelete] = useState<BoardMember | null>(null);
 
   const boardMembersCollectionRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -35,8 +48,24 @@ export default function AdminBoardMembersPage() {
     alert(`Edit board member with ID: ${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    alert(`Delete board member with ID: ${id}`);
+  const handleDelete = async () => {
+    if (!memberToDelete || !firestore) return;
+    const docRef = doc(firestore, 'board_members', memberToDelete.id);
+    try {
+      await deleteDoc(docRef);
+      toast({
+        title: "Board Member Deleted",
+        description: `The profile for "${memberToDelete.nameEn}" has been deleted.`,
+      });
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: "Delete Failed",
+        description: "Could not delete the board member. Please try again.",
+      });
+    } finally {
+      setMemberToDelete(null);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -94,7 +123,7 @@ export default function AdminBoardMembersPage() {
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(member.id)} aria-label="Edit">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(member.id)} aria-label="Delete">
+                        <Button variant="ghost" size="icon" onClick={() => setMemberToDelete(member)} aria-label="Delete">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </TableCell>
@@ -112,6 +141,21 @@ export default function AdminBoardMembersPage() {
           )}
         </CardContent>
       </Card>
+      
+      <AlertDialog open={!!memberToDelete} onOpenChange={(isOpen) => !isOpen && setMemberToDelete(null)}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete this member?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the profile for "{memberToDelete?.nameEn}".
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
