@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useCollection, useFirestore, useFirebaseApp, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, StorageError } from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,7 @@ export default function MediaPage() {
 
     const [file, setFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [itemToDelete, setItemToDelete] = useState<MediaItem | null>(null);
 
     const mediaCollectionRef = useMemoFirebase(() => {
@@ -48,7 +49,7 @@ export default function MediaPage() {
         }
     };
 
-    const handleUpload = async () => {
+    const handleUpload = () => {
         if (!file || !firebaseApp || !firestore) {
             toast({
                 variant: 'destructive',
@@ -59,57 +60,85 @@ export default function MediaPage() {
         }
 
         setIsUploading(true);
+        setUploadProgress(0);
 
-        try {
-            toast({ title: 'Upload Starting...', description: `Uploading ${file.name}.` });
-            const storage = getStorage(firebaseApp);
-            const storagePath = `images/${Date.now()}_${file.name}`;
-            const storageRef = ref(storage, storagePath);
+        const storage = getStorage(firebaseApp);
+        const storagePath = `images/${Date.now()}_${file.name}`;
+        const storageRef = ref(storage, storagePath);
 
-            // Step 1: Upload the file
-            const uploadResult = await uploadBytes(storageRef, file);
-            toast({ title: 'File Uploaded to Storage', description: 'Now getting download URL...' });
+        const uploadTask = uploadBytesResumable(storageRef, file);
 
-            // Step 2: Get the download URL
-            const downloadURL = await getDownloadURL(uploadResult.ref);
-            toast({ title: 'URL Obtained', description: 'Now saving metadata to Firestore...' });
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadProgress(progress);
+            },
+            (error) => {
+                console.error("Upload failed:", error);
+                let title = 'Upload Failed';
+                let description = 'An unknown error occurred. Please try again.';
 
-            // Step 3: Save metadata to Firestore
-            const mediaData = {
-                fileName: file.name,
-                imageUrl: downloadURL,
-                storagePath: storagePath,
-                contentType: file.type,
-                size: file.size,
-                uploadDate: serverTimestamp()
-            };
-            const mediaCollection = collection(firestore, 'media');
-            await addDoc(mediaCollection, mediaData);
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        description = "Permission Denied: You do not have permission to upload files. Please check your account roles and the storage security rules.";
+                        break;
+                    case 'storage/canceled':
+                        description = "The upload was canceled.";
+                        break;
+                    case 'storage/retry-limit-exceeded':
+                        description = "Network timeout. Please check your internet connection and try again.";
+                        break;
+                    default:
+                        description = `An unknown storage error occurred: ${error.message}`;
+                        break;
+                }
+                
+                toast({ variant: 'destructive', title, description });
+                setIsUploading(false);
+                setUploadProgress(0);
+            },
+            async () => {
+                // Upload completed successfully, now get the download URL
+                try {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    toast({ title: 'Upload Complete!', description: 'Now saving metadata...' });
 
-            toast({
-                variant: 'default',
-                title: 'Upload Complete!',
-                description: `${file.name} is now available in the library.`
-            });
-            setFile(null);
+                    const mediaData = {
+                        fileName: file.name,
+                        imageUrl: downloadURL,
+                        storagePath: storagePath,
+                        contentType: file.type,
+                        size: file.size,
+                        uploadDate: serverTimestamp()
+                    };
+                    const mediaCollection = collection(firestore, 'media');
+                    await addDoc(mediaCollection, mediaData);
 
-        } catch (e: any) {
-            console.error("A critical error occurred during upload:", e);
-            let title = 'Upload Failed';
-            let description = 'An unknown error occurred. Check the console for details.';
-
-            if (e instanceof StorageError) {
-                title = 'Storage Error';
-                description = `Code: ${e.code}. Message: ${e.message}. Please check your storage rules and network connection.`;
-            } else if (e.code && e.code.startsWith('firestore/')) {
-                 title = 'Firestore Error';
-                 description = `Could not save metadata. Code: ${e.code}. Message: ${e.message}`;
+                    toast({
+                        variant: 'default',
+                        title: 'Success!',
+                        description: `${file.name} is now available in the library.`
+                    });
+                    setFile(null);
+                } catch (e: any) {
+                    console.error("Failed to save metadata:", e);
+                    const firestoreError = new FirestorePermissionError({
+                      operation: 'create',
+                      path: 'media',
+                      requestResourceData: { fileName: file.name },
+                    });
+                    errorEmitter.emit('permission-error', firestoreError);
+                     toast({
+                        variant: 'destructive',
+                        title: 'Metadata Save Failed',
+                        description: 'The file was uploaded, but saving its information to the database failed. Please check Firestore permissions.'
+                    });
+                } finally {
+                    setIsUploading(false);
+                    setUploadProgress(0);
+                }
             }
-            
-            toast({ variant: 'destructive', title, description });
-        } finally {
-            setIsUploading(false);
-        }
+        );
     };
 
     const handleDelete = async () => {
@@ -134,7 +163,7 @@ export default function MediaPage() {
             let title = "Deletion Failed";
             let description = e.message || 'Could not delete the image.';
             
-            if (e instanceof StorageError && e.code === 'storage/object-not-found') {
+            if (e.code === 'storage/object-not-found') {
                 // If the file is already gone from storage, try to delete the Firestore doc anyway.
                 try {
                     await deleteDoc(docRef);
@@ -179,6 +208,12 @@ export default function MediaPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <Input type="file" onChange={handleFileChange} accept="image/*" disabled={isUploading} />
+                     {isUploading && (
+                        <div className="space-y-2 pt-2">
+                            <Progress value={uploadProgress} />
+                            <p className="text-sm text-muted-foreground text-center">{Math.round(uploadProgress)}%</p>
+                        </div>
+                    )}
                 </CardContent>
                 <CardFooter>
                     <Button onClick={handleUpload} disabled={!file || isUploading}>
