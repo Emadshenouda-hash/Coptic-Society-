@@ -82,6 +82,8 @@ export default function MediaPage() {
                     description = 'Permission Denied. Please ensure you are logged in as an admin and the Storage Rules are set correctly.';
                 } else if (error.code === 'storage/canceled') {
                     description = 'Upload was canceled.';
+                } else if (error.code === 'storage/retry-limit-exceeded') {
+                    description = 'Network connection failed. Please check your internet connection and Firebase Storage configuration, including the bucket name.';
                 }
                 toast({ variant: 'destructive', title: 'Upload Failed', description });
                 setIsUploading(false);
