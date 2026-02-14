@@ -14,6 +14,7 @@ import Image from 'next/image';
 import { format } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { firebaseConfig } from '@/firebase/config';
 
 interface MediaItem {
     id: string;
@@ -52,6 +53,15 @@ export default function MediaPage() {
 
     const handleUpload = async () => {
         if (!file || !firebaseApp || !firestore) return;
+
+        if (!firebaseConfig.storageBucket) {
+            toast({
+                variant: 'destructive',
+                title: 'Configuration Error',
+                description: 'The "storageBucket" is missing from your Firebase config. Cannot upload files.'
+            });
+            return;
+        }
 
         setIsUploading(true);
         const storage = getStorage(firebaseApp);
