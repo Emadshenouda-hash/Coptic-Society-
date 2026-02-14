@@ -57,7 +57,7 @@ export default function AdminProgramsPage() {
   }, [firestorePrograms]);
 
   const handleEdit = (id: string) => {
-    alert(`Edit program with ID: ${id}`);
+    router.push(`/admin/programs/edit/${id}`);
   };
 
   const handleCreate = async (program: StaticProgramType) => {
@@ -135,7 +135,7 @@ export default function AdminProgramsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage Programs</h1>
-        <Button onClick={() => alert('New program functionality coming soon!')}>
+        <Button onClick={() => router.push('/admin/programs/new')}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Program
         </Button>
