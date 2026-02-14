@@ -18,7 +18,8 @@ import {
     Users,
     FileArchive,
     Gift,
-    Inbox
+    Inbox,
+    Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
@@ -27,6 +28,7 @@ import { usePathname, useRouter } from 'next/navigation';
 const menuItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/pages', label: 'Page Content', icon: FileText },
+    { href: '/admin/media', label: 'Media Library', icon: ImageIcon },
     { href: '/admin/news', label: 'News', icon: Newspaper },
     { href: '/admin/programs', label: 'Programs', icon: HeartHandshake },
     { href: '/admin/board-members', label: 'Board Members', icon: Users },
@@ -86,3 +88,5 @@ export function AdminSidebar() {
     </Sidebar>
   );
 }
+
+    

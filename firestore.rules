@@ -170,6 +170,18 @@ service cloud.firestore {
       allow create, update: if isAdmin();
       allow delete: if isAdmin() && resource != null;
     }
+
+    /**
+     * @description Manages uploaded media files.
+     * @path /media/{mediaId}
+     * @allow (read) Publicly readable to allow image display on the website.
+     * @allow (write) Only administrators can upload, update metadata, or delete media.
+     * @principle Public Read, Admin-Only Write. Allows images to be used on the site while securing management.
+     */
+    match /media/{mediaId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
   }
 }
 
