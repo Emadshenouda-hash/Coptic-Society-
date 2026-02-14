@@ -4,9 +4,13 @@ import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/context/language-context';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const translations = {
+
+const staticTranslations = {
   en: {
     title: 'About Us',
     description: 'Learn about the history, mission, and vision of the Grand Coptic Benevolent Society, founded in 1881.',
@@ -36,33 +40,63 @@ const translations = {
 
 export default function AboutPage() {
   const { language, direction } = useLanguage();
-  const t = translations[language];
+  const firestore = useFirestore();
+  
+  const contentRef = useMemoFirebase(() => {
+      if (!firestore) return null;
+      return doc(firestore, 'page_content', 'about');
+  }, [firestore]);
+
+  const { data: dynamicContent, isLoading } = useDoc(contentRef);
+  
+  const t = useMemo(() => {
+    const content = dynamicContent?.contentEn ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : null;
+    return content || staticTranslations[language];
+  }, [dynamicContent, language]);
+
   const heritageImage = PlaceHolderImages.find(img => img.id === 'about-heritage');
   
   useEffect(() => {
-    document.title = `${t.title} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
-  }, [t.title, language]);
+    const pageTitle = t.title || staticTranslations[language].title;
+    document.title = `${pageTitle} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
+  }, [t, language]);
 
   return (
     <div className="bg-background" dir={direction}>
       <div className="container px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="text-center">
-          <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
-          <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-            {t.pageSubtitle}
-          </p>
+        {isLoading ? (
+            <>
+                <Skeleton className="h-12 w-3/4 mx-auto" />
+                <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
+            </>
+        ) : (
+            <>
+                <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
+                <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
+                    {t.pageSubtitle}
+                </p>
+            </>
+        )}
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-2 items-center">
            <div className="prose prose-lg max-w-none text-foreground" dir={direction}>
-            <h2 className="font-headline text-primary">{t.mission}</h2>
-            <p>
-              {t.missionText}
-            </p>
-            <h2 className="font-headline text-primary">{t.vision}</h2>
-            <p>
-              {t.visionText}
-            </p>
+            {isLoading ? (
+                <div className="space-y-8">
+                    <Skeleton className="h-8 w-1/3" />
+                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-8 w-1/3" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
+            ) : (
+                <>
+                    <h2 className="font-headline text-primary">{t.mission}</h2>
+                    <p>{t.missionText}</p>
+                    <h2 className="font-headline text-primary">{t.vision}</h2>
+                    <p>{t.visionText}</p>
+                </>
+            )}
            </div>
           {heritageImage && (
             <div className="relative h-96 w-full rounded-lg shadow-lg overflow-hidden">
@@ -80,12 +114,10 @@ export default function AboutPage() {
         <div className="mt-20">
             <Card className="bg-secondary">
                 <CardHeader>
-                    <CardTitle className="font-headline text-2xl text-primary">{t.registration}</CardTitle>
+                    {isLoading ? <Skeleton className="h-8 w-1/2" /> : <CardTitle className="font-headline text-2xl text-primary">{t.registration}</CardTitle>}
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground">
-                        {t.registrationText}
-                    </p>
+                    {isLoading ? <Skeleton className="h-10 w-full" /> : <p className="text-muted-foreground">{t.registrationText}</p>}
                 </CardContent>
             </Card>
         </div>
@@ -93,3 +125,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
+    

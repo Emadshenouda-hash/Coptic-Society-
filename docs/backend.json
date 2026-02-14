@@ -4,31 +4,21 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "PageContent",
       "type": "object",
-      "description": "Manages dynamic content for static web pages such as Home, About, Governance descriptions, Membership information, and Bylaws overview. This allows the society to update page text without developer intervention.",
+      "description": "Manages dynamic, translatable text content for static web pages. Each document corresponds to a page and holds key-value pairs for all its text elements.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the PageContent entity."
-        },
         "pageIdentifier": {
           "type": "string",
-          "description": "A unique slug or identifier for the page this content belongs to (e.g., 'home', 'about', 'governance', 'membership', 'bylaws-overview')."
-        },
-        "titleEn": {
-          "type": "string",
-          "description": "The title of the page content in English."
-        },
-        "titleAr": {
-          "type": "string",
-          "description": "The title of the page content in Arabic."
+          "description": "A unique slug or identifier for the page this content belongs to (e.g., 'home', 'about', 'contact'). This often serves as the document ID."
         },
         "contentEn": {
-          "type": "string",
-          "description": "The main body content of the page in English, potentially rich text."
+          "type": "object",
+          "description": "A key-value map of all text content for the page in English.",
+          "additionalProperties": { "type": "string" }
         },
         "contentAr": {
-          "type": "string",
-          "description": "The main body content of the page in Arabic, potentially rich text."
+          "type": "object",
+          "description": "A key-value map of all text content for the page in Arabic.",
+          "additionalProperties": { "type": "string" }
         },
         "lastUpdated": {
           "type": "string",
@@ -37,13 +27,9 @@
         }
       },
       "required": [
-        "id",
         "pageIdentifier",
-        "titleEn",
-        "titleAr",
         "contentEn",
-        "contentAr",
-        "lastUpdated"
+        "contentAr"
       ]
     },
     "Program": {
@@ -52,10 +38,6 @@
       "type": "object",
       "description": "Details various charitable programs and initiatives offered by the Grand Coptic Benevolent Society, such as Social Assistance, Healthcare, Education, etc.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Program entity."
-        },
         "nameEn": {
           "type": "string",
           "description": "The name of the program in English."
@@ -98,7 +80,6 @@
         }
       },
       "required": [
-        "id",
         "nameEn",
         "nameAr",
         "shortDescriptionEn",
@@ -115,10 +96,6 @@
       "type": "object",
       "description": "Stores information about the members of the Society's Board of Directors, who are elected every four years.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the BoardMember entity."
-        },
         "nameEn": {
           "type": "string",
           "description": "The full name of the board member in English."
@@ -160,7 +137,6 @@
         }
       },
       "required": [
-        "id",
         "nameEn",
         "nameAr",
         "titleEn",
@@ -176,10 +152,6 @@
       "type": "object",
       "description": "Represents dynamic content such as news articles, event announcements, and general updates for the 'News or Updates' page.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Post entity."
-        },
         "titleEn": {
           "type": "string",
           "description": "The title of the news/event post in English."
@@ -223,7 +195,6 @@
         }
       },
       "required": [
-        "id",
         "titleEn",
         "titleAr",
         "summaryEn",
@@ -240,10 +211,6 @@
       "type": "object",
       "description": "Stores submissions received through the website's contact form, facilitating communication and follow-up.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ContactSubmission entity."
-        },
         "fullName": {
           "type": "string",
           "description": "The full name of the person submitting the contact form."
@@ -276,7 +243,6 @@
         }
       },
       "required": [
-        "id",
         "fullName",
         "email",
         "subject",
@@ -291,10 +257,6 @@
       "type": "object",
       "description": "Stores official documents, such as bylaws, and their AI-generated summaries for quick comprehension.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Document entity."
-        },
         "titleEn": {
           "type": "string",
           "description": "The title of the document in English."
@@ -335,7 +297,6 @@
         }
       },
       "required": [
-        "id",
         "titleEn",
         "titleAr",
         "documentUrl",
@@ -349,10 +310,6 @@
       "type": "object",
       "description": "Represents a single donation made through the website.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the donation."
-        },
         "amount": {
           "type": "number",
           "description": "The amount of the donation."
@@ -381,7 +338,6 @@
         }
       },
       "required": [
-        "id",
         "amount",
         "isRecurring",
         "donorName",
@@ -482,4 +438,5 @@
     "reasoning": "The Firestore structure is designed to be secure, scalable, and debuggable by strictly adhering to the core design principles and strategy mandates. \n\n**Authorization Independence (CRITICAL) and QAPs (Rules are not Filters):**\n\n1.  **Homogeneous Security Posture:** Each top-level collection (`/page_content`, `/programs`, `/board_members`, `/posts`, `/documents`, `/contact_submissions`, `/roles_admin`, `/donations`) is designed to contain documents that share the exact same security requirements. This radical consistency is the primary mechanism for achieving Authorization Independence.\n    *   For collections like `/page_content`, `/programs`, `/board_members`, `/posts`, and `/documents`, all documents are intended for public consumption (read-only for all users) but can only be modified by authenticated administrators. Because all documents within these collections have the same public read access, a `list` operation from any client will return all documents, and the security rules can be a simple `allow read: if true;`. This directly supports QAPs as the rules are not filtering; they are simply granting full read access to the entire collection.\n    *   For `/contact_submissions` and `/donations`, all users (even unauthenticated) can create new submissions. However, only authenticated administrators can read or list these submissions. This homogeneous security posture within the collection (all can create, only admins can read/list) means a `list` query from an admin will succeed, and one from a non-admin will fail, upholding QAPs without complex in-rule filtering.\n\n2.  **No Hierarchical Data Dependencies:** Crucially, there are no subcollections whose authorization depends on attributes of their parent documents. All entities are stored in top-level collections. This eliminates the need for `get()` calls in security rules to check parent data, preventing issues with atomic operations (transactions/batches) and making rules easier to debug and reason about.\n\n3.  **DBAC (Database Access Control) for Global Roles:** Administrator roles are implemented using the 'existence over content' pattern in the `/roles_admin/{userId}` collection. An administrator's privilege is determined by the *existence* of a document with their UID in this collection. While checking for this existence in a security rule (e.g., `exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid))`) is a `get()` operation, it is a global, fixed lookup for a role, not a dependency on variable parent *data* within a content hierarchy. This is a widely accepted and secure pattern for global roles and does not violate the spirit of Authorization Independence as defined, which primarily targets hierarchical data dependencies.\n\nBy ensuring structural segregation, consistent security postures within collections, and avoiding hierarchical data dependencies, the design ensures that security rules are straightforward, explicit, and easy to audit, minimizing the risk of misconfiguration and enhancing debuggability. QAPs are naturally supported because the data is structured such that what can be read via a `list` operation is precisely what clients are authorized to see, without implicit filtering by rules."
   }
 }
+    
     

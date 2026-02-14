@@ -26,8 +26,8 @@ import { FirestorePermissionError } from '@/firebase/errors';
 interface PageContent {
   id: string;
   pageIdentifier: string;
-  titleEn: string;
-  titleAr: string;
+  contentEn: { title: string };
+  contentAr: { title: string };
   lastUpdated: {
     seconds: number;
     nanoseconds: number;
@@ -48,7 +48,7 @@ export default function AdminPagesPage() {
   const { data: pages, isLoading, error } = useCollection<PageContent>(pagesCollectionRef);
 
   const handleEdit = (id: string) => {
-    alert(`Edit page with ID: ${id}`);
+    router.push(`/admin/pages/edit/${id}`);
   };
 
   const handleDelete = async () => {
@@ -58,7 +58,7 @@ export default function AdminPagesPage() {
       await deleteDoc(docRef);
       toast({
         title: "Page Deleted",
-        description: `The page "${pageToDelete.titleEn}" has been deleted.`,
+        description: `The page "${pageToDelete.id}" has been deleted.`,
       });
     } catch (e) {
       console.error("Delete failed:", e);
@@ -91,7 +91,7 @@ export default function AdminPagesPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage Page Content</h1>
-        <Button onClick={() => alert('New page functionality coming soon!')}>
+        <Button onClick={() => alert('To add a new page, please contact the developer to have it configured.')}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Page
         </Button>
@@ -116,7 +116,6 @@ export default function AdminPagesPage() {
                 <TableRow>
                   <TableHead>Page Identifier</TableHead>
                   <TableHead>Title (English)</TableHead>
-                  <TableHead>Title (Arabic)</TableHead>
                   <TableHead>Last Updated</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -126,10 +125,9 @@ export default function AdminPagesPage() {
                   pages.map((page) => (
                     <TableRow key={page.id}>
                       <TableCell>
-                        <Badge variant="outline">{page.pageIdentifier}</Badge>
+                        <Badge variant="outline">{page.pageIdentifier || page.id}</Badge>
                       </TableCell>
-                      <TableCell>{page.titleEn}</TableCell>
-                      <TableCell>{page.titleAr}</TableCell>
+                      <TableCell>{page.contentEn?.title || 'N/A'}</TableCell>
                       <TableCell>{formatDate(page.lastUpdated)}</TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(page.id)} aria-label="Edit">
@@ -143,7 +141,7 @@ export default function AdminPagesPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center">
+                    <TableCell colSpan={4} className="text-center">
                       No page content found.
                     </TableCell>
                   </TableRow>
@@ -159,7 +157,7 @@ export default function AdminPagesPage() {
               <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure you want to delete this page content?</AlertDialogTitle>
                   <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the content for "{pageToDelete?.titleEn}".
+                      This action cannot be undone. This will permanently delete the content for the "{pageToDelete?.id}" page.
                   </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -171,3 +169,5 @@ export default function AdminPagesPage() {
     </div>
   );
 }
+
+    
