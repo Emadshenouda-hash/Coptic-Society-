@@ -1,22 +1,16 @@
 rules_version = '2';
 
-// v5 - Restoring correct rules alongside improved client-side upload logic.
-// service firebase.storage defines the security rules for Cloud Storage.
+// V9 - TEMPORARY DEBUGGING RULES
+// These rules are temporarily simplified to diagnose the upload issue.
+// They allow ANY authenticated user to upload, update, or delete files.
+// This is NOT secure for production and will be reverted once the issue is solved.
 service firebase.storage {
-  // The {bucket} wildcard matches your project's default storage bucket.
   match /b/{bucket}/o {
-
-    // This rule allows any user (authenticated or not) to read any file.
-    // This is necessary for images to be displayed on your public website.
     match /{allPaths=**} {
+      // Public read is still needed for website images
       allow read: if true;
-    }
-
-    // This rule ONLY applies to files inside the 'images/' folder.
-    // It grants write access (upload, update, delete) ONLY to administrators.
-    // An admin is defined as a user whose UID exists as a document in the /roles_admin collection.
-    match /images/{allPaths=**} {
-       allow write: if request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      // Allow write if the user is signed in. This removes the admin check for now.
+      allow write: if request.auth != null;
     }
   }
 }
