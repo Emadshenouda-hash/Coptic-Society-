@@ -15,6 +15,7 @@ export const programs: Program[] = [
     title: 'Social Assistance',
     titleAr: 'المساعدات الاجتماعية',
     icon: HeartHandshake,
+    iconName: 'HeartHandshake',
     description:
       'We provide a comprehensive support system for individuals and families facing hardship. Our services include financial aid, food and clothing distribution, emergency relief, and support for marriage, housing, and funerals. We also offer microloans to empower individuals to start small businesses and achieve financial independence.',
     descriptionAr:
@@ -26,6 +27,7 @@ export const programs: Program[] = [
     title: 'Healthcare Services',
     titleAr: 'خدمات الرعاية الصحية',
     icon: Stethoscope,
+    iconName: 'Stethoscope',
     description:
       'Access to affordable healthcare is a cornerstone of our mission. We operate social clinics, medical centers, and mobile medical convoys to reach underserved communities. We also provide essential medications and support for patients with chronic illnesses.',
     descriptionAr:
@@ -37,6 +39,7 @@ export const programs: Program[] = [
     title: 'Education & Training',
     titleAr: 'التعليم والتدريب',
     icon: BookOpen,
+    iconName: 'BookOpen',
     description:
       'Education is the key to a brighter future. We establish nurseries and schools, offer scholarships, and provide vocational training for women and youth. Our programs are designed to equip individuals with the skills and knowledge they need to succeed.',
     descriptionAr:
@@ -48,6 +51,7 @@ export const programs: Program[] = [
     title: 'Cultural & Religious Activities',
     titleAr: 'الأنشطة الثقافية والدينية',
     icon: Landmark,
+    iconName: 'Landmark',
     description:
       'We aim to enrich the community by promoting cultural, scientific, and religious awareness. We organize lectures, seminars, cultural festivals, and run libraries. Our activities are designed to preserve heritage and foster a sense of community.',
     descriptionAr:
@@ -59,6 +63,7 @@ export const programs: Program[] = [
     title: 'Community Development',
     titleAr: 'تنمية المجتمع',
     icon: Users,
+    iconName: 'Users',
     description:
       'Building strong communities is essential for social progress. We initiate environmental clean-up campaigns, participate in public-benefit projects, and collaborate with governmental and non-governmental organizations to combat poverty and illiteracy.',
     descriptionAr:
@@ -70,6 +75,7 @@ export const programs: Program[] = [
     title: 'Elderly Care',
     titleAr: 'رعاية كبار السن',
     icon: PersonStanding,
+    iconName: 'PersonStanding',
     description:
       'We honor our elders by providing them with the care and respect they deserve. Our services include operating senior homes that offer a safe and comfortable environment, as well as providing in-home support and social activities to ensure their well-being.',
     descriptionAr:
@@ -81,6 +87,7 @@ export const programs: Program[] = [
     title: 'Child Protection',
     titleAr: 'حماية الطفل',
     icon: Baby,
+    iconName: 'Baby',
     description:
       'We are committed to protecting and nurturing the next generation. We run kindergartens, after-school clubs, and summer camps. We also have sponsorship programs for orphans and initiatives to support street children, providing them with a safe path to a better life.',
     descriptionAr:

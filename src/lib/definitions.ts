@@ -16,6 +16,7 @@ export type Program = {
   title: string;
   titleAr: string;
   icon: React.ComponentType<{ className?: string }>;
+  iconName: string;
   description: string;
   descriptionAr: string;
   gallery: string[];

@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase, errorEmitter } from '@/firebase';
-import { collection, doc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, deleteDoc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { Loader2, PlusCircle, Edit, Trash2, Wand2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +21,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { programs as staticPrograms } from '@/lib/content';
+import { Program as StaticProgramType } from '@/lib/definitions';
 
 
 interface Program {
@@ -35,16 +37,72 @@ export default function AdminProgramsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
+  const [isCreating, setIsCreating] = useState<string | null>(null);
 
   const programsCollectionRef = useMemoFirebase(() => {
     if (!firestore) return null;
     return collection(firestore, 'programs');
   }, [firestore]);
 
-  const { data: programs, isLoading, error } = useCollection<Program>(programsCollectionRef);
+  const { data: firestorePrograms, isLoading, error } = useCollection<Program>(programsCollectionRef);
+
+  const displayPrograms = useMemo(() => {
+    return staticPrograms.map(staticProgram => {
+        const firestoreProgram = firestorePrograms?.find(p => p.id === staticProgram.id);
+        return {
+            ...staticProgram,
+            existsInDb: !!firestoreProgram,
+        };
+    });
+  }, [firestorePrograms]);
 
   const handleEdit = (id: string) => {
     alert(`Edit program with ID: ${id}`);
+  };
+
+  const handleCreate = async (program: StaticProgramType) => {
+    if (!firestore) {
+      toast({ variant: "destructive", title: "Database not available." });
+      return;
+    }
+    
+    setIsCreating(program.id);
+    try {
+        const docRef = doc(firestore, 'programs', program.id);
+        const dataToSet = {
+            nameEn: program.title,
+            nameAr: program.titleAr,
+            shortDescriptionEn: program.description,
+            shortDescriptionAr: program.descriptionAr,
+            fullDescriptionEn: program.description,
+            fullDescriptionAr: program.descriptionAr,
+            iconName: program.iconName,
+            imageUrl: `https://picsum.photos/seed/${program.id}/800/600`,
+            galleryImageUrls: [],
+        };
+
+        await setDoc(docRef, dataToSet);
+
+        toast({
+            title: "Program Created",
+            description: `The program "${program.title}" has been created. You can now edit it.`,
+        });
+    } catch (e: any) {
+        console.error("Create failed:", e);
+        const contextualError = new FirestorePermissionError({
+            operation: 'create',
+            path: `programs/${program.id}`,
+            requestResourceData: { programId: program.id }
+        });
+        errorEmitter.emit('permission-error', contextualError);
+        toast({
+            variant: 'destructive',
+            title: "Creation Failed",
+            description: e.message || "Could not create program.",
+        });
+    } finally {
+        setIsCreating(null);
+    }
   };
 
   const handleDelete = async () => {
@@ -101,32 +159,48 @@ export default function AdminProgramsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name (English)</TableHead>
-                  <TableHead>Name (Arabic)</TableHead>
                   <TableHead>Icon Name</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {programs && programs.length > 0 ? (
-                  programs.map((program) => (
+                {displayPrograms && displayPrograms.length > 0 ? (
+                  displayPrograms.map((program) => (
                     <TableRow key={program.id}>
-                      <TableCell>{program.nameEn}</TableCell>
-                      <TableCell>{program.nameAr}</TableCell>
+                      <TableCell>{program.title}</TableCell>
                       <TableCell><Badge variant="secondary">{program.iconName}</Badge></TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(program.id)} aria-label="Edit">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => setProgramToDelete(program)} aria-label="Delete">
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        {program.existsInDb ? (
+                            <>
+                                <Button variant="ghost" size="icon" onClick={() => handleEdit(program.id)} aria-label="Edit">
+                                    <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => setProgramToDelete({ id: program.id, nameEn: program.title, nameAr: program.titleAr, iconName: program.iconName })} aria-label="Delete">
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                            </>
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isCreating === program.id}
+                                onClick={() => handleCreate(program)}
+                            >
+                                {isCreating === program.id ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Wand2 className="mr-2 h-4 w-4" />
+                                )}
+                                Create in DB
+                            </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      No programs found.
+                    <TableCell colSpan={3} className="text-center">
+                      No static programs found to manage.
                     </TableCell>
                   </TableRow>
                 )}
