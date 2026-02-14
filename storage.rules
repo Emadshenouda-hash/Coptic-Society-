@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// 1. The service is `firebase.storage`, which governs file uploads.
+// 2. We match the specific storage bucket for your project.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Rule to allow public read access to all files.
+    // This is necessary so that images can be displayed on your public website for all visitors.
+    match /{allPaths=**} {
+      allow read: if true;
+    }
+
+    // Rule to restrict write access (uploads, updates, deletes).
+    // This rule allows write operations only if the user is authenticated AND
+    // a document with their UID exists in the `/roles_admin` collection in Firestore.
+    // This ensures only administrators can manage media.
+    match /images/{allPaths=**} {
+       allow write: if request.auth != null && exists(/databases/(default)/documents/roles_admin/$(request.auth.uid));
+    }
+  }
+}

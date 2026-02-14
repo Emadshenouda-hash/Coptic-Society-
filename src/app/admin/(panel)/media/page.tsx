@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useCollection, useFirestore, useFirebaseApp, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject, FirebaseStorageError } from "firebase/storage";
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -75,9 +75,15 @@ export default function MediaPage() {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 setUploadProgress(progress);
             },
-            (error) => {
+            (error: FirebaseStorageError) => {
                 console.error("Upload failed:", error);
-                toast({ variant: 'destructive', title: 'Upload Failed', description: error.message });
+                let description = 'An unknown error occurred during upload.';
+                if (error.code === 'storage/unauthorized') {
+                    description = 'Permission Denied. Please ensure you are logged in as an admin and the Storage Rules are set correctly.';
+                } else if (error.code === 'storage/canceled') {
+                    description = 'Upload was canceled.';
+                }
+                toast({ variant: 'destructive', title: 'Upload Failed', description });
                 setIsUploading(false);
             },
             async () => {
@@ -94,7 +100,6 @@ export default function MediaPage() {
                 
                 const mediaCollection = collection(firestore, 'media');
 
-                // Fire-and-forget the database write. UI becomes responsive immediately.
                 addDoc(mediaCollection, mediaData)
                   .then(() => {
                     toast({ title: 'Upload Successful', description: `${file.name} has been uploaded.` });
@@ -107,7 +112,7 @@ export default function MediaPage() {
                         requestResourceData: mediaData,
                     });
                     errorEmitter.emit('permission-error', contextualError);
-                    toast({ variant: 'destructive', title: 'Save Failed', description: 'Could not save image metadata to the database.' });
+                    toast({ variant: 'destructive', title: 'Save Failed', description: 'Could not save image metadata. You may not have database permissions.' });
                   });
 
                 setIsUploading(false);
