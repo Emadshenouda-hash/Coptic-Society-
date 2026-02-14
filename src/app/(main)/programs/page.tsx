@@ -5,9 +5,12 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { programs } from '@/lib/content';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/context/language-context';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const translations = {
+const staticTranslations = {
   en: {
     title: 'Our Programs',
     description: 'Explore the diverse programs offered by the Grand Coptic Benevolent Society, from social assistance and healthcare to education and community development.',
@@ -24,20 +27,38 @@ const translations = {
 
 export default function ProgramsPage() {
   const { language, direction } = useLanguage();
-  const t = translations[language];
+  
+  const firestore = useFirestore();
+  const contentRef = useMemoFirebase(() => firestore ? doc(firestore, 'page_content', 'programs') : null, [firestore]);
+  const { data: dynamicContent, isLoading } = useDoc(contentRef);
+
+  const t = useMemo(() => {
+    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : null;
+    return content || staticTranslations[language];
+  }, [dynamicContent, language]);
 
   useEffect(() => {
-    document.title = `${t.title} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
-  }, [t.title, language]);
+    const pageTitle = t.title || staticTranslations[language].title;
+    document.title = `${pageTitle} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
+  }, [t, language]);
 
   return (
     <div className="bg-background" dir={direction}>
       <div className="container px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="text-center">
-          <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
-          <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-            {t.pageSubtitle}
-          </p>
+          {isLoading ? (
+                <>
+                    <Skeleton className="h-12 w-3/4 mx-auto" />
+                    <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
+                </>
+            ) : (
+                <>
+                  <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
+                  <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
+                    {t.pageSubtitle}
+                  </p>
+                </>
+          )}
         </div>
 
         <div className="mt-12">

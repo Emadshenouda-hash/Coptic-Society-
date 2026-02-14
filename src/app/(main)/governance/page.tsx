@@ -3,9 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/context/language-context';
 import { Users, Shield } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const translations = {
+const staticTranslations = {
   en: {
     title: 'Governance',
     description: 'Understand the governance structure of the Grand Coptic Benevolent Society, including the roles of the General Assembly and the Board of Directors.',
@@ -20,7 +23,7 @@ const translations = {
       'Setting the society\'s general policies and strategic direction.',
       'Overseeing the work of the Board and various committees.',
       'Amending the society\'s bylaws when necessary.',
-    ],
+    ].join('\n'),
     boardOfDirectors: 'The Board of Directors',
     boardOfDirectorsDesc: 'The Board of Directors is elected by the General Assembly and is responsible for managing the society\'s day-to-day affairs and implementing its policies. The board consists of dedicated members who serve on a voluntary basis.',
     boardOfDirectorsDuties: [
@@ -29,7 +32,7 @@ const translations = {
       'Preparing budgets and activity reports for the General Assembly.',
       'Representing the society in all administrative and legal matters.',
       'Appointing and supervising staff.',
-    ],
+    ].join('\n'),
     orgStructure: 'Organizational Structure',
     orgStructureDesc: 'Our structure ensures democratic oversight and efficient management.',
     gaNode: 'General Assembly',
@@ -55,7 +58,7 @@ const translations = {
       'وضع السياسات العامة للجمعية وتوجهها الاستراتيجي.',
       'الإشراف على عمل المجلس واللجان المختلفة.',
       'تعديل النظام الأساسي للجمعية عند الضرورة.',
-    ],
+    ].join('\n'),
     boardOfDirectors: 'مجلس الإدارة',
     boardOfDirectorsDesc: 'ينتخب مجلس الإدارة من قبل الجمعية العمومية وهو مسؤول عن إدارة الشؤون اليومية للجمعية وتنفيذ سياساتها. يتكون المجلس من أعضاء متفانين يخدمون على أساس طوعي.',
     boardOfDirectorsDuties: [
@@ -64,7 +67,7 @@ const translations = {
       'إعداد الميزانيات وتقارير النشاط للجمعية العمومية.',
       'تمثيل الجمعية في جميع المسائل الإدارية والقانونية.',
       'تعيين الموظفين والإشراف عليهم.',
-    ],
+    ].join('\n'),
     orgStructure: 'الهيكل التنظيمي',
     orgStructureDesc: 'يضمن هيكلنا الرقابة الديمقراطية والإدارة الفعالة.',
     gaNode: 'الجمعية العمومية',
@@ -80,20 +83,38 @@ const translations = {
 
 export default function GovernancePage() {
   const { language, direction } = useLanguage();
-  const t = translations[language];
+  
+  const firestore = useFirestore();
+  const contentRef = useMemoFirebase(() => firestore ? doc(firestore, 'page_content', 'governance') : null, [firestore]);
+  const { data: dynamicContent, isLoading } = useDoc(contentRef);
+
+  const t = useMemo(() => {
+    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : null;
+    return content || staticTranslations[language];
+  }, [dynamicContent, language]);
 
   useEffect(() => {
-    document.title = `${t.title} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
-  }, [t.title, language]);
+    const pageTitle = t.title || staticTranslations[language].title;
+    document.title = `${pageTitle} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
+  }, [t, language]);
 
   return (
     <div className="bg-background" dir={direction}>
       <div className="container px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="text-center">
-          <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
-          <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-            {t.pageSubtitle}
-          </p>
+            {isLoading ? (
+                <>
+                    <Skeleton className="h-12 w-3/4 mx-auto" />
+                    <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
+                </>
+            ) : (
+                <>
+                    <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
+                    <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
+                        {t.pageSubtitle}
+                    </p>
+                </>
+            )}
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -101,39 +122,57 @@ export default function GovernancePage() {
             <CardHeader>
               <CardTitle className="font-headline text-2xl text-primary flex items-center gap-3">
                 <Users className="h-6 w-6 text-accent" />
-                {t.generalAssembly}
+                {isLoading ? <Skeleton className="h-7 w-48" /> : t.generalAssembly}
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none text-muted-foreground" dir={direction}>
-              <p>{t.generalAssemblyDesc}</p>
-              <strong>{t.keyDuties}</strong>
-              <ul>
-                {t.generalAssemblyDuties.map(duty => <li key={duty}>{duty}</li>)}
-              </ul>
+                {isLoading ? (
+                    <div className="space-y-4">
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-6 w-24" />
+                        <Skeleton className="h-32 w-full" />
+                    </div>
+                ) : (
+                    <>
+                        <p>{t.generalAssemblyDesc}</p>
+                        <strong>{t.keyDuties}</strong>
+                        <ul>
+                            {(t.generalAssemblyDuties || '').split('\n').map((duty, i) => <li key={i}>{duty}</li>)}
+                        </ul>
+                    </>
+                )}
             </CardContent>
           </Card>
           <Card className="bg-card">
             <CardHeader>
               <CardTitle className="font-headline text-2xl text-primary flex items-center gap-3">
                 <Shield className="h-6 w-6 text-accent" />
-                {t.boardOfDirectors}
+                {isLoading ? <Skeleton className="h-7 w-56" /> : t.boardOfDirectors}
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none text-muted-foreground" dir={direction}>
-              <p>{t.boardOfDirectorsDesc}</p>
-              <strong>{t.keyDuties}</strong>
-              <ul>
-                {t.boardOfDirectorsDuties.map(duty => <li key={duty}>{duty}</li>)}
-              </ul>
+                {isLoading ? (
+                    <div className="space-y-4">
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-6 w-24" />
+                        <Skeleton className="h-32 w-full" />
+                    </div>
+                ) : (
+                    <>
+                        <p>{t.boardOfDirectorsDesc}</p>
+                        <strong>{t.keyDuties}</strong>
+                        <ul>
+                            {(t.boardOfDirectorsDuties || '').split('\n').map((duty, i) => <li key={i}>{duty}</li>)}
+                        </ul>
+                    </>
+                )}
             </CardContent>
           </Card>
         </div>
         
         <div className="mt-16 text-center">
-          <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.orgStructure}</h2>
-          <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">
-            {t.orgStructureDesc}
-          </p>
+            {isLoading ? <Skeleton className="h-10 w-1/2 mx-auto" /> : <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.orgStructure}</h2>}
+            {isLoading ? <Skeleton className="h-6 w-3/4 mx-auto mt-4" /> : <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">{t.orgStructureDesc}</p>}
           <div className="mt-12 flex flex-col items-center">
             <div className="p-4 bg-primary text-primary-foreground rounded-lg shadow-lg w-72">
                 <h3 className="font-bold font-headline">{t.gaNode}</h3>

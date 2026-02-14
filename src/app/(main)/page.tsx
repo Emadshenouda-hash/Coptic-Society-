@@ -8,8 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { programs, newsArticles } from '@/lib/content';
 import { useLanguage } from '@/context/language-context';
+import { useEffect, useMemo } from 'react';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const translations = {
+const staticTranslations = {
   en: {
     heroTitle: 'Serving Egypt since 1881',
     heroSubtitle: 'Enhancing social justice and dignity for needy families of all backgrounds across Egypt.',
@@ -38,13 +42,25 @@ const translations = {
   }
 };
 
-
 export default function HomePage() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'home-hero');
   const programIcons = programs.slice(0, 6);
   const recentNews = newsArticles.slice(0, 3);
   const { language, direction } = useLanguage();
-  const t = translations[language];
+
+  const firestore = useFirestore();
+  const contentRef = useMemoFirebase(() => firestore ? doc(firestore, 'page_content', 'home') : null, [firestore]);
+  const { data: dynamicContent, isLoading } = useDoc(contentRef);
+
+  const t = useMemo(() => {
+    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : null;
+    return content || staticTranslations[language];
+  }, [dynamicContent, language]);
+  
+  useEffect(() => {
+    document.title = `${language === 'en' ? 'Home' : 'الرئيسية'} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
+  }, [language]);
+
 
   return (
     <div className="flex-1" dir={direction}>
@@ -63,12 +79,21 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-primary/70" />
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-primary-foreground">
           <div className="container px-4 sm:px-6 lg:px-8">
-            <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl">
-              {t.heroTitle}
-            </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl">
-              {t.heroSubtitle}
-            </p>
+            {isLoading ? (
+                <div className='space-y-4'>
+                    <Skeleton className="h-16 w-full max-w-4xl mx-auto bg-primary-foreground/20" />
+                    <Skeleton className="h-6 w-full max-w-2xl mx-auto bg-primary-foreground/20" />
+                </div>
+            ) : (
+                <>
+                    <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl">
+                        {t.heroTitle}
+                    </h1>
+                    <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl">
+                        {t.heroSubtitle}
+                    </p>
+                </>
+            )}
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Link href="/donate">{t.donateNow}</Link>
@@ -85,10 +110,8 @@ export default function HomePage() {
       <section className="py-16 lg:py-24 bg-background">
         <div className="container px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.corePrograms}</h2>
-            <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">
-              {t.programsSubtitle}
-            </p>
+             {isLoading ? <Skeleton className="h-10 w-1/2 mx-auto" /> : <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.corePrograms}</h2>}
+             {isLoading ? <Skeleton className="h-6 w-3/4 mx-auto mt-4" /> : <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">{t.programsSubtitle}</p>}
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {programIcons.map((program) => (
@@ -115,10 +138,8 @@ export default function HomePage() {
       <section className="py-16 lg:py-24 bg-secondary">
         <div className="container px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.latestNews}</h2>
-            <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">
-              {t.newsSubtitle}
-            </p>
+            {isLoading ? <Skeleton className="h-10 w-1/2 mx-auto" /> : <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.latestNews}</h2>}
+            {isLoading ? <Skeleton className="h-6 w-3/4 mx-auto mt-4" /> : <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">{t.newsSubtitle}</p>}
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {recentNews.map((article) => {
