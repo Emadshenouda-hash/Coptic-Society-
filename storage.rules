@@ -1,5 +1,6 @@
 rules_version = '2';
 
+// v3 - This is a forced update to trigger deployment.
 // service firebase.storage defines the security rules for Cloud Storage.
 service firebase.storage {
   // The {bucket} wildcard matches your project's default storage bucket.
