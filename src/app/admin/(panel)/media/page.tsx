@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -64,59 +65,52 @@ export default function MediaPage() {
         const storage = getStorage(firebaseApp);
         const storagePath = `images/${Date.now()}_${file.name}`;
         const storageRef = ref(storage, storagePath);
-        const uploadTask = uploadBytesResumable(storageRef, file);
 
-        uploadTask.on('state_changed',
-            (snapshot) => {
+        try {
+            // This is a more robust way to handle the upload with clear steps.
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            // Set up a listener to update the progress bar in real-time.
+            uploadTask.on('state_changed', (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 setUploadProgress(progress);
-            },
-            (error) => {
-                // This is the error handler for the upload itself.
-                console.error("!!! Firebase Storage Upload Error:", error);
-                toast({
-                    variant: 'destructive',
-                    title: 'Storage Upload Failed',
-                    description: `Error: ${error.code} - ${error.message}. Check the console for full details.`,
-                    duration: 10000,
-                });
-                setIsUploading(false);
-                setUploadProgress(0);
-            },
-            async () => {
-                // This function runs when the upload is complete.
-                try {
-                    toast({ title: 'Upload Complete!', description: 'Getting download URL...' });
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            });
 
-                    toast({ title: 'Saving file information...' });
-                    const mediaData = {
-                        fileName: file.name,
-                        imageUrl: downloadURL,
-                        storagePath: storagePath,
-                        contentType: file.type,
-                        size: file.size,
-                        uploadDate: serverTimestamp()
-                    };
-                    const mediaCollection = collection(firestore, 'media');
-                    await addDoc(mediaCollection, mediaData);
+            // Await the completion of the upload. If this fails, the catch block will execute.
+            toast({ title: "Uploading file..." });
+            const snapshot = await uploadTask;
+            toast({ title: "✅ Upload Complete", description: "Getting download URL..." });
 
-                    toast({ variant: 'default', title: 'Success!', description: `${file.name} is now in the library.` });
-                    setFile(null);
-                } catch (e: any) {
-                    console.error("!!! Firestore Metadata Save Error:", e);
-                    toast({
-                        variant: 'destructive',
-                        title: 'Database Save Failed',
-                        description: `The file uploaded, but saving its info failed. Error: ${e.code} - ${e.message}. Check console for details.`,
-                        duration: 10000,
-                    });
-                } finally {
-                    setIsUploading(false);
-                    setUploadProgress(0);
-                }
-            }
-        );
+            // Get the public URL for the file.
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            toast({ title: "✅ URL Obtained", description: "Saving metadata..." });
+
+            // Save the file's metadata to the Firestore database.
+            const mediaData = {
+                fileName: file.name,
+                imageUrl: downloadURL,
+                storagePath: storagePath,
+                contentType: file.type,
+                size: file.size,
+                uploadDate: serverTimestamp()
+            };
+            await addDoc(collection(firestore, 'media'), mediaData);
+
+            toast({ variant: 'default', title: '🚀 Success!', description: `${file.name} is now in the library.` });
+            setFile(null);
+
+        } catch (e: any) {
+            console.error("!!! A definitive error occurred during upload:", e);
+            toast({
+                variant: 'destructive',
+                title: 'Upload Failed: A Clear Error!',
+                description: `Code: ${e.code || 'N/A'}. Message: ${e.message}`,
+                duration: 20000, // Keep this error on screen longer
+            });
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+        }
     };
 
     const handleDelete = async () => {
@@ -259,4 +253,3 @@ export default function MediaPage() {
         </div>
     );
 }
-    

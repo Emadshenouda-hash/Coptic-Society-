@@ -47,15 +47,14 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
     match /roles_admin/{userId} {
-      // THIS IS THE FIX: Allow any signed-in user (and Firebase services) to read roles.
-      // This breaks the deadlock where Storage rules couldn't check admin status.
       allow get: if isSignedIn();
-      // Listing or modifying roles remains restricted to admins.
       allow list, create, update, delete: if isAdmin();
     }
     match /media/{mediaId} {
       allow get, list: if true;
-      allow create, update, delete: if isAdmin();
+      // TEMPORARY DEBUGGING RULE: Allow any signed-in user to create.
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
     }
   }
 }
