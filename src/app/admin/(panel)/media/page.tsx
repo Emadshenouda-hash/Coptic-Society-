@@ -51,7 +51,7 @@ export default function MediaPage() {
     };
 
     const handleUpload = async () => {
-        if (!file || !firebaseApp) return;
+        if (!file || !firebaseApp || !firestore) return;
 
         setIsUploading(true);
         const storage = getStorage(firebaseApp);
@@ -73,20 +73,32 @@ export default function MediaPage() {
             async () => {
                 const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                 
-                try {
-                    await addDoc(collection(firestore, 'media'), {
-                        fileName: file.name,
-                        imageUrl: downloadURL,
-                        storagePath: storagePath,
-                        contentType: file.type,
-                        size: file.size,
-                        uploadDate: serverTimestamp()
-                    });
+                const mediaData = {
+                    fileName: file.name,
+                    imageUrl: downloadURL,
+                    storagePath: storagePath,
+                    contentType: file.type,
+                    size: file.size,
+                    uploadDate: serverTimestamp()
+                };
+                
+                const mediaCollection = collection(firestore, 'media');
+
+                // Fire-and-forget the database write. UI becomes responsive immediately.
+                addDoc(mediaCollection, mediaData)
+                  .then(() => {
                     toast({ title: 'Upload Successful', description: `${file.name} has been uploaded.` });
-                } catch(e) {
-                     console.error("Firestore write failed:", e);
-                     toast({ variant: 'destructive', title: 'Upload Failed', description: 'Could not save image metadata to database.' });
-                }
+                  })
+                  .catch((e) => {
+                    console.error("Firestore write failed:", e);
+                    const contextualError = new FirestorePermissionError({
+                        operation: 'create',
+                        path: mediaCollection.path,
+                        requestResourceData: mediaData,
+                    });
+                    errorEmitter.emit('permission-error', contextualError);
+                    toast({ variant: 'destructive', title: 'Save Failed', description: 'Could not save image metadata to the database.' });
+                  });
 
                 setIsUploading(false);
                 setFile(null);
@@ -214,5 +226,3 @@ export default function MediaPage() {
         </div>
     );
 }
-
-    
