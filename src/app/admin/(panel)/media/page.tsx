@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCollection, useFirestore, useFirebaseApp, useMemoFirebase, errorEmitter } from '@/firebase';
+import { useCollection, useFirestore, useFirebaseApp, useMemoFirebase } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, Copy, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { FirestorePermissionError } from '@/firebase/errors';
 
 interface MediaItem {
     id: string;
@@ -49,7 +48,7 @@ export default function MediaPage() {
         }
     };
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         if (!file || !firebaseApp || !firestore) {
             toast({
                 variant: 'destructive',
@@ -65,7 +64,6 @@ export default function MediaPage() {
         const storage = getStorage(firebaseApp);
         const storagePath = `images/${Date.now()}_${file.name}`;
         const storageRef = ref(storage, storagePath);
-
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed',
@@ -74,35 +72,24 @@ export default function MediaPage() {
                 setUploadProgress(progress);
             },
             (error) => {
-                console.error("Upload failed:", error);
-                let title = 'Upload Failed';
-                let description = 'An unknown error occurred. Please try again.';
-
-                switch (error.code) {
-                    case 'storage/unauthorized':
-                        description = "Permission Denied: You do not have permission to upload files. Please check your account roles and the storage security rules.";
-                        break;
-                    case 'storage/canceled':
-                        description = "The upload was canceled.";
-                        break;
-                    case 'storage/retry-limit-exceeded':
-                        description = "Network timeout. Please check your internet connection and try again.";
-                        break;
-                    default:
-                        description = `An unknown storage error occurred: ${error.message}`;
-                        break;
-                }
-                
-                toast({ variant: 'destructive', title, description });
+                // This is the error handler for the upload itself.
+                console.error("!!! Firebase Storage Upload Error:", error);
+                toast({
+                    variant: 'destructive',
+                    title: 'Storage Upload Failed',
+                    description: `Error: ${error.code} - ${error.message}. Check the console for full details.`,
+                    duration: 10000,
+                });
                 setIsUploading(false);
                 setUploadProgress(0);
             },
             async () => {
-                // Upload completed successfully, now get the download URL
+                // This function runs when the upload is complete.
                 try {
+                    toast({ title: 'Upload Complete!', description: 'Getting download URL...' });
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    toast({ title: 'Upload Complete!', description: 'Now saving metadata...' });
 
+                    toast({ title: 'Saving file information...' });
                     const mediaData = {
                         fileName: file.name,
                         imageUrl: downloadURL,
@@ -114,24 +101,15 @@ export default function MediaPage() {
                     const mediaCollection = collection(firestore, 'media');
                     await addDoc(mediaCollection, mediaData);
 
-                    toast({
-                        variant: 'default',
-                        title: 'Success!',
-                        description: `${file.name} is now available in the library.`
-                    });
+                    toast({ variant: 'default', title: 'Success!', description: `${file.name} is now in the library.` });
                     setFile(null);
                 } catch (e: any) {
-                    console.error("Failed to save metadata:", e);
-                    const firestoreError = new FirestorePermissionError({
-                      operation: 'create',
-                      path: 'media',
-                      requestResourceData: { fileName: file.name },
-                    });
-                    errorEmitter.emit('permission-error', firestoreError);
-                     toast({
+                    console.error("!!! Firestore Metadata Save Error:", e);
+                    toast({
                         variant: 'destructive',
-                        title: 'Metadata Save Failed',
-                        description: 'The file was uploaded, but saving its information to the database failed. Please check Firestore permissions.'
+                        title: 'Database Save Failed',
+                        description: `The file uploaded, but saving its info failed. Error: ${e.code} - ${e.message}. Check console for details.`,
+                        duration: 10000,
                     });
                 } finally {
                     setIsUploading(false);
@@ -151,33 +129,32 @@ export default function MediaPage() {
         const docRef = doc(firestore, 'media', id);
 
         try {
-            // First, delete the file from Cloud Storage.
+            toast({ title: "Deleting file...", description: `Removing "${fileName}" from storage.`});
             await deleteObject(fileRef);
-            toast({ title: 'File Deleted from Storage', description: 'Now deleting from Firestore.' });
 
-            // Then, delete the document from Firestore.
+            toast({ title: "Deleting record...", description: `Removing "${fileName}" from the database.`});
             await deleteDoc(docRef);
+
             toast({ title: 'Image Deleted', description: `${fileName} has been completely removed.`});
         } catch(e: any) {
             console.error("Deletion failed:", e);
             let title = "Deletion Failed";
-            let description = e.message || 'Could not delete the image.';
+            let description = `Could not delete the image. Error: ${e.message}`;
             
             if (e.code === 'storage/object-not-found') {
-                // If the file is already gone from storage, try to delete the Firestore doc anyway.
+                description = "File was not found in storage. Deleting the database record anyway.";
+                toast({ title: "Storage file not found", description });
                 try {
                     await deleteDoc(docRef);
-                    toast({ title: 'Image Deleted', description: 'File was already gone from storage, but metadata was removed.'});
-                } catch (firestoreError: any) {
-                     toast({ variant: 'destructive', title: 'Firestore Deletion Failed', description: firestoreError.message});
+                    toast({ title: 'Database record deleted' });
+                } catch (docError: any) {
+                    toast({ variant: 'destructive', title: 'Database deletion also failed', description: docError.message, duration: 10000 });
                 }
+            } else if (e.code) { 
+                 description = `Could not delete the image. Reason: ${e.code}. Please check permissions and console for details.`;
+                 toast({ variant: 'destructive', title, description, duration: 10000});
             } else {
-                 const contextualError = new FirestorePermissionError({
-                  operation: 'delete',
-                  path: docRef.path
-                });
-                errorEmitter.emit('permission-error', contextualError);
-                toast({ variant: 'destructive', title, description});
+                 toast({ variant: 'destructive', title, description, duration: 10000});
             }
         } finally {
             setItemToDelete(null);
@@ -282,3 +259,4 @@ export default function MediaPage() {
         </div>
     );
 }
+    
