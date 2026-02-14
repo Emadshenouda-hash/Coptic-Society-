@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc, updateDoc } from 'firebase/firestore';
+import { collection, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,6 +10,18 @@ import { Loader2, Trash2, Eye, EyeOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
 
 interface ContactSubmission {
   id: string;
@@ -27,6 +39,9 @@ interface ContactSubmission {
 export default function AdminSubmissionsPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
+  
+  const [submissionToView, setSubmissionToView] = useState<ContactSubmission | null>(null);
+  const [submissionToDelete, setSubmissionToDelete] = useState<ContactSubmission | null>(null);
 
   const submissionsCollectionRef = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -35,8 +50,24 @@ export default function AdminSubmissionsPage() {
 
   const { data: submissions, isLoading, error } = useCollection<ContactSubmission>(submissionsCollectionRef);
 
-  const handleDelete = (id: string) => {
-    alert(`Delete submission with ID: ${id}`);
+  const handleDelete = async () => {
+    if (!submissionToDelete || !firestore) return;
+    const docRef = doc(firestore, 'contact_submissions', submissionToDelete.id);
+    try {
+      await deleteDoc(docRef);
+      toast({
+        title: "Submission Deleted",
+        description: `The message from ${submissionToDelete.fullName} has been deleted.`,
+      });
+    } catch (e) {
+       toast({
+        variant: 'destructive',
+        title: "Delete Failed",
+        description: "Could not delete the submission. Please try again."
+      });
+    } finally {
+        setSubmissionToDelete(null);
+    }
   };
 
   const toggleReadStatus = async (submission: ContactSubmission) => {
@@ -111,10 +142,10 @@ export default function AdminSubmissionsPage() {
                         <Button variant="ghost" size="icon" onClick={() => toggleReadStatus(submission)} aria-label="Toggle read status">
                           {submission.isRead ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => alert('Viewing the message will be implemented soon.')} aria-label="View message">
+                        <Button variant="ghost" size="icon" onClick={() => setSubmissionToView(submission)} aria-label="View message">
                            <Eye className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(submission.id)} aria-label="Delete">
+                        <Button variant="ghost" size="icon" onClick={() => setSubmissionToDelete(submission)} aria-label="Delete">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </TableCell>
@@ -132,6 +163,38 @@ export default function AdminSubmissionsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* View Dialog */}
+      <Dialog open={!!submissionToView} onOpenChange={(isOpen) => !isOpen && setSubmissionToView(null)}>
+        <DialogContent>
+            {submissionToView && (
+                <>
+                    <DialogHeader>
+                        <DialogTitle>{submissionToView.subject}</DialogTitle>
+                        <DialogDescription>From: {submissionToView.fullName} ({submissionToView.email})</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 whitespace-pre-wrap text-sm text-muted-foreground">{submissionToView.message}</div>
+                </>
+            )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!submissionToDelete} onOpenChange={(isOpen) => !isOpen && setSubmissionToDelete(null)}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete this message?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the submission from {submissionToDelete?.fullName}.
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
