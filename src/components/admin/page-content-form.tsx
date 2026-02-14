@@ -3,7 +3,6 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2 } from 'lucide-react';
@@ -44,8 +43,6 @@ export function PageContentForm({ initialData, docId }: PageContentFormProps) {
   const { toast } = useToast();
   
   const form = useForm<PageContentFormData>({
-    // Since we can't use zod's schema directly with dynamic keys, we handle it manually.
-    // The resolver is mainly for structure validation.
     resolver: zodResolver(formSchema), 
     defaultValues: useMemo(() => ({
       contentEn: Object.entries(initialData.contentEn || {}).map(([key, value]) => ({ key, value })),
@@ -93,66 +90,60 @@ export function PageContentForm({ initialData, docId }: PageContentFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card>
+        <div className="space-y-6">
+          {fieldsEn.map((field, index) => {
+            const arFieldIndex = fieldsAr.findIndex(f => f.key === field.key);
+            return (
+              <Card key={field.id}>
                 <CardHeader>
-                    <CardTitle>English Content</CardTitle>
+                  <CardTitle className="capitalize font-normal text-lg">{field.key.replace(/([A-Z])/g, ' $1')}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {fieldsEn.map((field, index) => (
-                        <FormField
-                            key={field.id}
-                            control={form.control}
-                            name={`contentEn.${index}.value`}
-                            render={({ field: renderField }) => (
-                                <FormItem>
-                                    <FormLabel className="font-semibold capitalize">{field.key.replace(/([A-Z])/g, ' $1')}</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...renderField} rows={3}/>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    ))}
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name={`contentEn.${index}.value`}
+                    render={({ field: renderField }) => (
+                      <FormItem>
+                        <FormLabel>English</FormLabel>
+                        <FormControl>
+                          <Textarea {...renderField} rows={renderField.value.length > 80 ? 5 : 3} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {arFieldIndex !== -1 && (
+                    <FormField
+                      key={fieldsAr[arFieldIndex].id}
+                      control={form.control}
+                      name={`contentAr.${arFieldIndex}.value`}
+                      render={({ field: renderField }) => (
+                        <FormItem dir="rtl">
+                          <FormLabel>العربية</FormLabel>
+                          <FormControl>
+                             <Textarea {...renderField} rows={renderField.value.length > 80 ? 5 : 3} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </CardContent>
-            </Card>
-             <Card dir="rtl">
-                <CardHeader>
-                    <CardTitle>محتوى عربي</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                     {fieldsAr.map((field, index) => (
-                        <FormField
-                            key={field.id}
-                            control={form.control}
-                            name={`contentAr.${index}.value`}
-                            render={({ field: renderField }) => (
-                                <FormItem>
-                                    <FormLabel className="font-semibold capitalize">{field.key.replace(/([A-Z])/g, ' $1')}</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...renderField} rows={3}/>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    ))}
-                </CardContent>
-            </Card>
+              </Card>
+            );
+          })}
         </div>
+
         <div className="flex items-center gap-4">
-            <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Update Content
-            </Button>
-            <Button type="button" variant="outline" onClick={() => router.back()}>
-                Cancel
-            </Button>
+          </Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
         </div>
       </form>
     </Form>
   );
 }
-
-    
