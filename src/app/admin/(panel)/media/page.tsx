@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useCollection, useFirestore, useFirebaseApp, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject, FirebaseStorageError } from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -52,76 +52,100 @@ export default function MediaPage() {
     };
 
     const handleUpload = async () => {
-        if (!file || !firebaseApp || !firestore) return;
-
+        if (!file || !firebaseApp || !firestore) {
+            toast({
+                variant: 'destructive',
+                title: 'Initialization Error',
+                description: 'Firebase services are not ready. Please refresh the page.'
+            });
+            return;
+        }
         if (!firebaseConfig.storageBucket) {
             toast({
                 variant: 'destructive',
                 title: 'Configuration Error',
-                description: 'The "storageBucket" is missing from your Firebase config. Cannot upload files.'
+                description: 'Firebase Storage Bucket is not configured.'
             });
             return;
         }
-
+    
         setIsUploading(true);
-        const storage = getStorage(firebaseApp);
-        const storagePath = `images/${Date.now()}_${file.name}`;
-        const storageRef = ref(storage, storagePath);
-        
-        const uploadTask = uploadBytesResumable(storageRef, file);
-
-        uploadTask.on('state_changed',
-            (snapshot) => {
+        setUploadProgress(0);
+    
+        try {
+            const storage = getStorage(firebaseApp);
+            const storagePath = `images/${Date.now()}_${file.name}`;
+            const storageRef = ref(storage, storagePath);
+    
+            // Step 1: Upload the file
+            const uploadTask = uploadBytesResumable(storageRef, file);
+    
+            // Add a listener for progress
+            uploadTask.on('state_changed', (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 setUploadProgress(progress);
-            },
-            (error: FirebaseStorageError) => {
-                console.error("Upload failed:", error);
-                let description = 'An unknown error occurred during upload.';
-                if (error.code === 'storage/unauthorized') {
-                    description = 'Permission Denied. Please ensure you are logged in as an admin and the Storage Rules are set correctly.';
-                } else if (error.code === 'storage/canceled') {
-                    description = 'Upload was canceled.';
-                } else if (error.code === 'storage/retry-limit-exceeded') {
-                    description = 'Network connection failed. Please check your internet connection and Firebase Storage configuration, including the bucket name.';
+            });
+    
+            // Await the upload completion
+            await uploadTask;
+            
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+    
+            // Step 2: Save metadata to Firestore
+            const mediaData = {
+                fileName: file.name,
+                imageUrl: downloadURL,
+                storagePath: storagePath,
+                contentType: file.type,
+                size: file.size,
+                uploadDate: serverTimestamp()
+            };
+            
+            const mediaCollection = collection(firestore, 'media');
+            await addDoc(mediaCollection, mediaData);
+            
+            toast({ title: 'Upload Successful', description: `${file.name} has been uploaded.` });
+            setFile(null);
+    
+        } catch (error: any) {
+            console.error("A failure occurred during the upload process:", error);
+            
+            let title = 'Upload Failed';
+            let description = 'An unknown error occurred.';
+    
+            if (error.code) { // Firebase error
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        title = 'Permission Denied';
+                        description = 'You do not have permission to upload files. Check Storage Rules.';
+                        break;
+                    case 'storage/retry-limit-exceeded':
+                        title = 'Network Error';
+                        description = 'Connection timed out. Please check your network and Firebase config.';
+                        break;
+                    case 'storage/canceled':
+                        title = 'Upload Canceled';
+                        description = 'The upload was canceled.';
+                        break;
+                    case 'permission-denied': // Firestore permission denied
+                        title = 'Database Permission Denied';
+                        description = 'You do not have permission to save file metadata.';
+                        errorEmitter.emit('permission-error', new FirestorePermissionError({ operation: 'create', path: 'media' }));
+                        break;
+                    default:
+                        description = error.message;
+                        break;
                 }
-                toast({ variant: 'destructive', title: 'Upload Failed', description });
-                setIsUploading(false);
-            },
-            async () => {
-                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                
-                const mediaData = {
-                    fileName: file.name,
-                    imageUrl: downloadURL,
-                    storagePath: storagePath,
-                    contentType: file.type,
-                    size: file.size,
-                    uploadDate: serverTimestamp()
-                };
-                
-                const mediaCollection = collection(firestore, 'media');
-
-                addDoc(mediaCollection, mediaData)
-                  .then(() => {
-                    toast({ title: 'Upload Successful', description: `${file.name} has been uploaded.` });
-                  })
-                  .catch((e) => {
-                    console.error("Firestore write failed:", e);
-                    const contextualError = new FirestorePermissionError({
-                        operation: 'create',
-                        path: mediaCollection.path,
-                        requestResourceData: mediaData,
-                    });
-                    errorEmitter.emit('permission-error', contextualError);
-                    toast({ variant: 'destructive', title: 'Save Failed', description: 'Could not save image metadata. You may not have database permissions.' });
-                  });
-
-                setIsUploading(false);
-                setFile(null);
-                setUploadProgress(0);
+            } else {
+                description = error.message || String(error);
             }
-        );
+    
+            toast({ variant: 'destructive', title, description });
+    
+        } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+        }
     };
 
     const handleDelete = async () => {
