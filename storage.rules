@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// v4 - TEMPORARY DEBUGGING STEP
+// v5 - Restoring correct rules alongside improved client-side upload logic.
 // service firebase.storage defines the security rules for Cloud Storage.
 service firebase.storage {
   // The {bucket} wildcard matches your project's default storage bucket.
@@ -13,10 +13,10 @@ service firebase.storage {
     }
 
     // This rule ONLY applies to files inside the 'images/' folder.
-    // TEMPORARY: Allow write if user is simply authenticated, to test if the
-    // exists() check is the source of the problem.
+    // It grants write access (upload, update, delete) ONLY to administrators.
+    // An admin is defined as a user whose UID exists as a document in the /roles_admin collection.
     match /images/{allPaths=**} {
-       allow write: if request.auth != null;
+       allow write: if request.auth != null && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
     }
   }
 }

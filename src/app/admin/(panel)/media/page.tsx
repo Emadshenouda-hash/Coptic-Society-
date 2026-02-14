@@ -52,99 +52,107 @@ export default function MediaPage() {
     };
 
     const handleUpload = async () => {
-        if (!file || !firebaseApp || !firestore) {
+        if (!file || !firebaseApp) {
             toast({
                 variant: 'destructive',
                 title: 'Initialization Error',
-                description: 'Firebase services are not ready. Please refresh the page.'
+                description: 'Firebase services are not ready or no file selected. Please refresh the page and select a file.'
             });
             return;
         }
-        if (!firebaseConfig.storageBucket) {
+         if (!firebaseConfig.storageBucket) {
             toast({
                 variant: 'destructive',
                 title: 'Configuration Error',
-                description: 'Firebase Storage Bucket is not configured.'
+                description: 'Firebase Storage Bucket is not configured in src/firebase/config.ts.'
             });
             return;
         }
-    
+
         setIsUploading(true);
         setUploadProgress(0);
-    
+
         try {
             const storage = getStorage(firebaseApp);
             const storagePath = `images/${Date.now()}_${file.name}`;
             const storageRef = ref(storage, storagePath);
-    
-            // Step 1: Upload the file
+
             const uploadTask = uploadBytesResumable(storageRef, file);
-    
-            // Add a listener for progress
-            uploadTask.on('state_changed', (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setUploadProgress(progress);
-            });
-    
-            // Await the upload completion
-            await uploadTask;
-            
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-    
-            // Step 2: Save metadata to Firestore
-            const mediaData = {
-                fileName: file.name,
-                imageUrl: downloadURL,
-                storagePath: storagePath,
-                contentType: file.type,
-                size: file.size,
-                uploadDate: serverTimestamp()
-            };
-            
-            const mediaCollection = collection(firestore, 'media');
-            await addDoc(mediaCollection, mediaData);
-            
-            toast({ title: 'Upload Successful', description: `${file.name} has been uploaded.` });
-            setFile(null);
-    
-        } catch (error: any) {
-            console.error("A failure occurred during the upload process:", error);
-            
-            let title = 'Upload Failed';
-            let description = 'An unknown error occurred.';
-    
-            if (error.code) { // Firebase error
-                switch (error.code) {
-                    case 'storage/unauthorized':
-                        title = 'Permission Denied';
-                        description = 'You do not have permission to upload files. Check Storage Rules.';
-                        break;
-                    case 'storage/retry-limit-exceeded':
-                        title = 'Network Error';
-                        description = 'Connection timed out. Please check your network and Firebase config.';
-                        break;
-                    case 'storage/canceled':
-                        title = 'Upload Canceled';
-                        description = 'The upload was canceled.';
-                        break;
-                    case 'permission-denied': // Firestore permission denied
-                        title = 'Database Permission Denied';
-                        description = 'You do not have permission to save file metadata.';
-                        errorEmitter.emit('permission-error', new FirestorePermissionError({ operation: 'create', path: 'media' }));
-                        break;
-                    default:
-                        description = error.message;
-                        break;
+
+            uploadTask.on('state_changed',
+                (snapshot) => { // on progress
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setUploadProgress(progress);
+                },
+                (error) => { // on error
+                    console.error("Upload task failed:", error);
+                    let title = 'Upload Failed';
+                    let description = 'An unexpected error occurred during the upload.';
+                    switch (error.code) {
+                        case 'storage/unauthorized':
+                            title = 'Permission Denied';
+                            description = 'You do not have permission to upload files. Please check your Storage Rules in the Firebase Console.';
+                            break;
+                        case 'storage/canceled':
+                            title = 'Upload Canceled';
+                            description = 'The upload was canceled.';
+                            break;
+                        case 'storage/unknown':
+                            title = 'Unknown Storage Error';
+                            description = 'An unknown error occurred. Please check the browser console for more details.';
+                            break;
+                        case 'storage/retry-limit-exceeded':
+                            title = 'Network Error';
+                            description = 'Connection timed out. Please check your network connection and Firebase project status, then try again.';
+                            break;
+                    }
+                    toast({ variant: 'destructive', title, description });
+                    setIsUploading(false);
+                    setUploadProgress(0);
+                },
+                async () => { // on complete
+                    try {
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                        
+                        if (!firestore) {
+                            toast({ variant: 'destructive', title: 'Firestore Error', description: 'File uploaded, but could not save metadata. Firestore service is unavailable.' });
+                            setIsUploading(false);
+                            return;
+                        }
+                        
+                        const mediaData = {
+                            fileName: file.name,
+                            imageUrl: downloadURL,
+                            storagePath: storagePath,
+                            contentType: file.type,
+                            size: file.size,
+                            uploadDate: serverTimestamp()
+                        };
+                        
+                        const mediaCollection = collection(firestore, 'media');
+                        await addDoc(mediaCollection, mediaData);
+
+                        toast({ title: 'Upload Complete!', description: `${file.name} is now available in the library.` });
+                        setFile(null); // Reset file input
+
+                    } catch (firestoreError: any) {
+                        console.error("Firestore metadata write failed:", firestoreError);
+                        let description = "Could not save file metadata after upload. The file is in storage but not in the library. Please check Firestore permissions for the 'media' collection.";
+                        if (firestoreError.code === 'permission-denied') {
+                            description = "Permission denied when saving file metadata to Firestore. Check your Firestore rules for the 'media' collection."
+                        }
+                        toast({ variant: 'destructive', title: 'Metadata Save Failed', description });
+                    } finally {
+                        setIsUploading(false);
+                        setUploadProgress(0);
+                    }
                 }
-            } else {
-                description = error.message || String(error);
-            }
-    
-            toast({ variant: 'destructive', title, description });
-    
-        } finally {
+            );
+
+        } catch (e) {
+            console.error("Outer catch block for upload:", e);
+            toast({ variant: 'destructive', title: 'Upload Initialization Failed', description: 'Could not start the upload process.' });
             setIsUploading(false);
-            setUploadProgress(0);
         }
     };
 
