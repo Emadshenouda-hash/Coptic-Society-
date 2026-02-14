@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface Document {
   id: string;
@@ -62,10 +63,16 @@ export default function AdminDocumentsPage() {
         description: `The document "${docToDelete.titleEn}" has been deleted.`,
       });
     } catch (e) {
+      console.error("Delete failed:", e);
+      const contextualError = new FirestorePermissionError({
+        operation: 'delete',
+        path: docRef.path
+      });
+      errorEmitter.emit('permission-error', contextualError);
       toast({
         variant: 'destructive',
         title: "Delete Failed",
-        description: "Could not delete the document. Please try again.",
+        description: "Could not delete the document. You may not have the required permissions.",
       });
     } finally {
       setDocToDelete(null);

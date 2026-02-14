@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -20,6 +20,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { FirestorePermissionError } from '@/firebase/errors';
+
 
 interface Program {
   id: string;
@@ -55,10 +57,16 @@ export default function AdminProgramsPage() {
         description: `The program "${programToDelete.nameEn}" has been deleted.`,
       });
     } catch (e) {
+      console.error("Delete failed:", e);
+      const contextualError = new FirestorePermissionError({
+        operation: 'delete',
+        path: docRef.path
+      });
+      errorEmitter.emit('permission-error', contextualError);
       toast({
         variant: 'destructive',
         title: "Delete Failed",
-        description: "Could not delete the program. Please try again.",
+        description: "Could not delete the program. You may not have the required permissions.",
       });
     } finally {
       setProgramToDelete(null);

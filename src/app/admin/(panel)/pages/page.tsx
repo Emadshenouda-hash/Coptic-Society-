@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -21,8 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { FirestorePermissionError } from '@/firebase/errors';
 
-// Define the type based on your backend.json entity
 interface PageContent {
   id: string;
   pageIdentifier: string;
@@ -48,8 +48,6 @@ export default function AdminPagesPage() {
   const { data: pages, isLoading, error } = useCollection<PageContent>(pagesCollectionRef);
 
   const handleEdit = (id: string) => {
-    // This will be implemented later
-    // router.push(`/admin/pages/edit/${id}`);
     alert(`Edit page with ID: ${id}`);
   };
 
@@ -63,10 +61,16 @@ export default function AdminPagesPage() {
         description: `The page "${pageToDelete.titleEn}" has been deleted.`,
       });
     } catch (e) {
+      console.error("Delete failed:", e);
+      const contextualError = new FirestorePermissionError({
+        operation: 'delete',
+        path: docRef.path
+      });
+      errorEmitter.emit('permission-error', contextualError);
       toast({
         variant: 'destructive',
         title: "Delete Failed",
-        description: "Could not delete the page. Please try again.",
+        description: "Could not delete the page. You may not have the required permissions.",
       });
     } finally {
       setPageToDelete(null);
@@ -75,7 +79,6 @@ export default function AdminPagesPage() {
   
   const formatDate = (timestamp: any) => {
     if (!timestamp) return 'N/A';
-    // Firestore timestamp can be a Date object or a { seconds, nanoseconds } object
     const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : timestamp;
     try {
         return format(date, 'PPP p');

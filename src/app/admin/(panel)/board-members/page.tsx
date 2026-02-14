@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface BoardMember {
   id: string;
@@ -45,7 +46,7 @@ export default function AdminBoardMembersPage() {
   const { data: boardMembers, isLoading, error } = useCollection<BoardMember>(boardMembersCollectionRef);
 
   const handleEdit = (id: string) => {
-    alert(`Edit board member with ID: ${id}`);
+    router.push(`/admin/board-members/edit/${id}`);
   };
 
   const handleDelete = async () => {
@@ -58,10 +59,16 @@ export default function AdminBoardMembersPage() {
         description: `The profile for "${memberToDelete.nameEn}" has been deleted.`,
       });
     } catch (e) {
+      console.error("Delete failed:", e);
+      const contextualError = new FirestorePermissionError({
+        operation: 'delete',
+        path: docRef.path
+      });
+      errorEmitter.emit('permission-error', contextualError);
       toast({
         variant: 'destructive',
         title: "Delete Failed",
-        description: "Could not delete the board member. Please try again.",
+        description: "Could not delete the board member. You may not have the required permissions.",
       });
     } finally {
       setMemberToDelete(null);
@@ -71,7 +78,10 @@ export default function AdminBoardMembersPage() {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     try {
-        return format(new Date(dateString), 'PPP');
+        // Assuming date is stored as 'YYYY-MM-DD' string, needs to be handled by Date constructor
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Invalid Date';
+        return format(date, 'PPP');
     } catch {
         return 'Invalid Date';
     }
@@ -81,7 +91,7 @@ export default function AdminBoardMembersPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage Board Members</h1>
-        <Button onClick={() => alert('New member functionality coming soon!')}>
+        <Button onClick={() => router.push('/admin/board-members/new')}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Member
         </Button>

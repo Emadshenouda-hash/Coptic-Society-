@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, errorEmitter } from '@/firebase';
 import { collection, doc, deleteDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 interface Post {
   id: string;
@@ -45,7 +46,7 @@ export default function AdminNewsPage() {
   const { data: posts, isLoading, error } = useCollection<Post>(postsCollectionRef);
 
   const handleEdit = (id: string) => {
-    alert(`Edit post with ID: ${id}`);
+    router.push(`/admin/news/edit/${id}`);
   };
 
   const handleDelete = async () => {
@@ -58,10 +59,16 @@ export default function AdminNewsPage() {
         description: `The post "${postToDelete.titleEn}" has been deleted.`,
       });
     } catch (e) {
+      console.error("Delete failed:", e);
+      const contextualError = new FirestorePermissionError({
+        operation: 'delete',
+        path: docRef.path
+      });
+      errorEmitter.emit('permission-error', contextualError);
       toast({
         variant: 'destructive',
         title: "Delete Failed",
-        description: "Could not delete the post. Please try again.",
+        description: "Could not delete the post. You may not have the required permissions.",
       });
     } finally {
       setPostToDelete(null);
@@ -82,7 +89,7 @@ export default function AdminNewsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Manage News</h1>
-        <Button onClick={() => alert('New post functionality coming soon!')}>
+        <Button onClick={() => router.push('/admin/news/new')}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Post
         </Button>
@@ -141,7 +148,6 @@ export default function AdminNewsPage() {
         </CardContent>
       </Card>
       
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!postToDelete} onOpenChange={(isOpen) => !isOpen && setPostToDelete(null)}>
           <AlertDialogContent>
               <AlertDialogHeader>
