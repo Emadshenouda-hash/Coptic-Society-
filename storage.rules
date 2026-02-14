@@ -1,26 +1,22 @@
 rules_version = '2';
 
-// v3 - This is a forced update to trigger deployment.
+// v4 - TEMPORARY DEBUGGING STEP
 // service firebase.storage defines the security rules for Cloud Storage.
 service firebase.storage {
   // The {bucket} wildcard matches your project's default storage bucket.
   match /b/{bucket}/o {
 
-    // This rule applies to all files in the bucket.
-    // It allows any user (authenticated or not) to read any file.
-    // This is necessary so that images can be displayed on your public-facing website.
-    // Write access is implicitly denied here because there is no 'allow write' statement.
+    // This rule allows any user (authenticated or not) to read any file.
+    // This is necessary for images to be displayed on your public website.
     match /{allPaths=**} {
       allow read: if true;
     }
 
-    // This is a more specific rule that ONLY applies to files inside the 'images/' folder.
-    // It grants write access (create, update, delete) for files in this folder.
+    // This rule ONLY applies to files inside the 'images/' folder.
+    // TEMPORARY: Allow write if user is simply authenticated, to test if the
+    // exists() check is the source of the problem.
     match /images/{allPaths=**} {
-       // The write is only allowed if the user is signed in (request.auth != null)
-       // AND a document with the user's ID exists in the '/roles_admin' collection in Firestore.
-       // This is our check to ensure the user is an administrator.
-       allow write: if request.auth != null && exists(/databases/(default)/documents/roles_admin/$(request.auth.uid));
+       allow write: if request.auth != null;
     }
   }
 }
