@@ -1,3 +1,4 @@
+
 /**
  * Core Philosophy:
  * This ruleset implements a dual-access security model tailored for a public-facing website with an administrative backend.
@@ -158,14 +159,13 @@ service cloud.firestore {
     /**
      * @description Manages administrator roles using a DBAC (Database Access Control) pattern.
      * @path /roles_admin/{userId}
-     * @allow (get) An administrator can check the role status of another user.
-     * @allow (get) A user can check their own role status (e.g., for UI changes). Auth UID must match {userId}.
-     * @deny (list) A non-admin user cannot list all administrators.
+     * @allow (get) **MODIFIED:** Any signed-in user can read a role document. This is CRITICAL for Storage rules to verify admin status.
+     * @allow (list) An administrator can list all admin roles.
      * @deny (create) A standard user cannot grant themselves or others admin privileges.
      * @principle Role-Based Access Control. Secures the list of admins and prevents privilege escalation.
      */
     match /roles_admin/{userId} {
-      allow get: if isAdmin() || isOwner(userId);
+      allow get: if isSignedIn();
       allow list: if isAdmin();
       allow create, update: if isAdmin();
       allow delete: if isAdmin() && resource != null;
