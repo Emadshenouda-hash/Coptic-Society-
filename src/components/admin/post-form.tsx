@@ -122,7 +122,7 @@ export function PostForm({ initialData, docId }: PostFormProps) {
             control={form.control}
             name="summaryEn"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
+              <FormItem>
                 <FormLabel>Summary (English)</FormLabel>
                 <FormControl>
                   <Textarea placeholder="A short summary of the post..." {...field} />
@@ -135,7 +135,7 @@ export function PostForm({ initialData, docId }: PostFormProps) {
             control={form.control}
             name="summaryAr"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
+              <FormItem>
                 <FormLabel>Summary (Arabic)</FormLabel>
                 <FormControl>
                   <Textarea placeholder="ملخص قصير للمنشور..." {...field} dir="rtl" />
@@ -148,7 +148,7 @@ export function PostForm({ initialData, docId }: PostFormProps) {
             control={form.control}
             name="contentEn"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
+              <FormItem>
                 <FormLabel>Content (English)</FormLabel>
                 <FormControl>
                   <Textarea placeholder="The full content of the post..." rows={10} {...field} />
@@ -161,7 +161,7 @@ export function PostForm({ initialData, docId }: PostFormProps) {
             control={form.control}
             name="contentAr"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
+              <FormItem>
                 <FormLabel>Content (Arabic)</FormLabel>
                 <FormControl>
                   <Textarea placeholder="المحتوى الكامل للمنشور..." rows={10} {...field} dir="rtl" />
@@ -174,7 +174,7 @@ export function PostForm({ initialData, docId }: PostFormProps) {
             control={form.control}
             name="imageUrl"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="md:col-span-2">
                 <FormLabel>Featured Image URL</FormLabel>
                 <FormControl>
                   <Input type="url" placeholder="https://example.com/image.jpg" {...field} />
@@ -187,8 +187,8 @@ export function PostForm({ initialData, docId }: PostFormProps) {
             control={form.control}
             name="tags"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tags</FormLabel>
+              <FormItem className="md:col-span-2">
+                <FormLabel>Tags (comma-separated)</FormLabel>
                 <FormControl>
                   <Input placeholder="event, charity, cairo" {...field} />
                 </FormControl>

@@ -123,6 +123,7 @@ export function BoardMemberForm({ initialData, docId }: BoardMemberFormProps) {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="titleEn"
@@ -149,11 +150,12 @@ export function BoardMemberForm({ initialData, docId }: BoardMemberFormProps) {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="bioEn"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
+              <FormItem>
                 <FormLabel>Bio (English)</FormLabel>
                 <FormControl>
                   <Textarea placeholder="A short biography..." {...field} />
@@ -166,7 +168,7 @@ export function BoardMemberForm({ initialData, docId }: BoardMemberFormProps) {
             control={form.control}
             name="bioAr"
             render={({ field }) => (
-              <FormItem className="md:col-span-2">
+              <FormItem>
                 <FormLabel>Bio (Arabic)</FormLabel>
                 <FormControl>
                   <Textarea placeholder="سيرة ذاتية قصيرة..." {...field} dir="rtl" />
@@ -175,6 +177,7 @@ export function BoardMemberForm({ initialData, docId }: BoardMemberFormProps) {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="termStartDate"
@@ -227,6 +230,7 @@ export function BoardMemberForm({ initialData, docId }: BoardMemberFormProps) {
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name="imageUrl"
