@@ -11,7 +11,7 @@ service firebase.storage {
       allow read: if true;
     }
 
-    // Rule to restrict write access (uploads, updates, deletes).
+    // Rule to restrict write access (uploads, updates, deletes) to the /images path.
     // This rule allows write operations only if the user is authenticated AND
     // a document with their UID exists in the `/roles_admin` collection in Firestore.
     // This ensures only administrators can manage media.
