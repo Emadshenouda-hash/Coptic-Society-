@@ -1,5 +1,6 @@
 'use client';
 import { useLanguage } from "@/context/language-context";
+import { cn } from "@/lib/utils";
 
 const translations = {
     en: { alt: "The Grand Coptic Benevolent Society" },
@@ -14,7 +15,10 @@ export function BrandHeader() {
     <header className="bg-secondary py-10 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-4xl text-center">
         <div className="mb-4">
-            <h2 className="font-amiri text-5xl md:text-6xl font-bold text-primary" lang="ar">
+            <h2 className={cn(
+              "text-5xl md:text-6xl font-bold text-primary",
+              language === 'ar' ? 'font-amiri' : 'font-cinzel'
+            )} lang={language}>
               {t.alt}
             </h2>
         </div>

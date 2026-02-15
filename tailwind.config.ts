@@ -16,6 +16,7 @@ export default {
         code: ['monospace'],
         amiri: ['Amiri', 'serif'],
         montserrat: ['Montserrat', 'sans-serif'],
+        cinzel: ['Cinzel', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
