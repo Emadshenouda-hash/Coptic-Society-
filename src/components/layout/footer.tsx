@@ -49,7 +49,7 @@ export function Footer() {
             <ul className="mt-4 space-y-2 text-sm">
               <li><Link href="/about" className="hover:text-primary transition-colors">{t.about}</Link></li>
               <li><Link href="/programs" className="hover:text-primary transition-colors">{t.programs}</Link></li>
-              <li><Link href="/donate" className="hover:text-primary transition-colors">{t.donate}</Link></li>
+              {/* <li><Link href="/donate" className="hover:text-primary transition-colors">{t.donate}</Link></li> */}
               <li><Link href="/contact" className="hover:text-primary transition-colors">{t.contact}</Link></li>
             </ul>
           </div>

@@ -53,9 +53,9 @@ export function Header() {
 
         <div className="hidden items-center gap-2 md:flex">
           <LanguageSwitcher />
-          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+          {/* <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Link href="/donate">{donateButtonTranslations[language]}</Link>
-          </Button>
+          </Button> */}
         </div>
 
         <div className="md:hidden">
@@ -88,9 +88,9 @@ export function Header() {
                   ))}
                 </nav>
                 <div className="mt-auto flex flex-col gap-4 border-t p-4">
-                  <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                  {/* <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                     <Link href="/donate">{donateButtonTranslations[language]}</Link>
-                  </Button>
+                  </Button> */}
                   <LanguageSwitcher />
                 </div>
               </div>

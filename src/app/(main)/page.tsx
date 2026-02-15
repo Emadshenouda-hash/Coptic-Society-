@@ -95,9 +95,9 @@ export default function HomePage() {
                 </>
             )}
             <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+              {/* <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Link href="/donate">{t.donateNow}</Link>
-              </Button>
+              </Button> */}
               <Button size="lg" variant="outline" asChild className="border-primary-foreground text-primary-foreground bg-transparent hover:bg-primary-foreground hover:text-primary">
                 <Link href="/about">{t.learnMore}</Link>
               </Button>
