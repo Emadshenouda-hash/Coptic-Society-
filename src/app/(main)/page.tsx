@@ -115,16 +115,16 @@ export default function HomePage() {
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {programIcons.map((program) => (
-              <Card key={program.id} className="text-center transition-all hover:shadow-lg hover:-translate-y-1">
+              <Card key={program.id} className="text-center transition-all hover:shadow-lg hover:-translate-y-1 flex flex-col">
                 <CardHeader>
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent">
                     <program.icon className="h-8 w-8" />
                   </div>
                   <CardTitle className="font-headline pt-4">{language === 'ar' ? program.titleAr : program.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex flex-col flex-grow">
                   <p className="text-muted-foreground text-sm">{(language === 'ar' ? program.descriptionAr : program.description).substring(0, 100)}...</p>
-                  <Button variant="link" asChild className="mt-4 text-accent hover:text-accent/80">
+                  <Button variant="link" asChild className="mt-auto pt-4 text-accent hover:text-accent/80">
                     <Link href={`/programs#${program.id}`}>{t.readMore} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
                   </Button>
                 </CardContent>
