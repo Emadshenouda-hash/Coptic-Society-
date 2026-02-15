@@ -89,8 +89,8 @@ export default function GovernancePage() {
   const { data: dynamicContent, isLoading } = useDoc(contentRef);
 
   const t = useMemo(() => {
-    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : null;
-    return content || staticTranslations[language];
+    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : {};
+    return { ...staticTranslations[language], ...content };
   }, [dynamicContent, language]);
 
   useEffect(() => {
