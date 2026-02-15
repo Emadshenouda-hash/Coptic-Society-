@@ -17,7 +17,7 @@ const navLinks = [
   { href: '/governance', en: 'Governance', ar: 'الحوكمة' },
   { href: '/membership', en: 'Membership', ar: 'العضوية' },
   { href: '/bylaws', en: 'Bylaws', ar: 'النظام الأساسي' },
-  { href: '/news', en: 'News', ar: 'الأخبار' },
+  // { href: '/news', en: 'News', ar: 'الأخبار' },
   { href: '/contact', en: 'Contact', ar: 'اتصل بنا' },
 ];
 

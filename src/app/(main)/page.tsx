@@ -134,7 +134,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Latest News Section */}
+      {/* Latest News Section - Temporarily Hidden */}
+      {/*
       <section className="py-16 lg:py-24 bg-secondary">
         <div className="container px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -180,6 +181,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      */}
     </div>
   );
 }
