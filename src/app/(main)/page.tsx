@@ -64,8 +64,13 @@ export default function HomePage() {
   const { data: dynamicContent, isLoading: isContentLoading } = useDoc(contentRef);
 
   const t = useMemo(() => {
-    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : {};
-    return { ...staticTranslations[language], ...content };
+    const dbContent = dynamicContent || {};
+    const fallback = staticTranslations[language];
+    // Merge database content with fallback, ensuring no empty strings if DB is missing keys
+    const content = language === 'ar' 
+        ? { ...fallback, ...dbContent.contentAr }
+        : { ...fallback, ...dbContent.contentEn };
+    return content;
   }, [dynamicContent, language]);
   
   useEffect(() => {
@@ -127,7 +132,7 @@ export default function HomePage() {
                   { title: t.becomeMember, desc: t.becomeMemberDesc, href: '/membership', icon: UserPlus },
                   { title: t.volunteer, desc: t.volunteerDesc, href: '/contact', icon: HandHeart },
                   { title: t.requestAssistance, desc: t.requestAssistanceDesc, href: '/programs', icon: HelpCircle },
-                ].map(item => (
+                ].filter(item => item.href !== '/donate').map(item => (
                   <Card key={item.href} className="text-center transition-all hover:shadow-lg hover:-translate-y-1 flex flex-col">
                       <CardHeader>
                           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent">

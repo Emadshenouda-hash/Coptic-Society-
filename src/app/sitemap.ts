@@ -11,7 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/membership',
     '/bylaws',
     '/contact',
-    '/donate',
   ];
 
   return staticPages.map((path) => ({

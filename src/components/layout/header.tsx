@@ -54,9 +54,9 @@ export function Header() {
           <div className="hidden md:flex">
             <LanguageSwitcher />
           </div>
-          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+          {/* <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Link href="/donate">{donateButtonTranslations[language]}</Link>
-          </Button>
+          </Button> */}
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
