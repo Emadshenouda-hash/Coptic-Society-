@@ -23,11 +23,11 @@ export function BrandHeader() {
             </h2>
         </div>
 
-        <div className="font-montserrat bg-primary text-primary-foreground rounded-lg p-4">
-          <h1 className="m-0 font-bold uppercase tracking-wider text-lg md:text-xl lg:text-2xl leading-tight">
+        <div className="bg-primary text-primary-foreground rounded-lg p-4">
+          <h1 className="m-0 font-cinzel font-bold uppercase tracking-wider text-lg md:text-2xl lg:text-2xl leading-tight">
             THE GRAND COPTIC BENEVOLENT SOCIETY
           </h1>
-          <p className="mt-2 mb-0 font-light uppercase tracking-widest text-xs md:text-sm leading-tight opacity-95">
+          <p className="mt-2 mb-0 font-montserrat font-light uppercase tracking-widest text-xs md:text-sm leading-tight opacity-95">
             FOUNDED BY THE LATE BOUTROS PASHA GHALI
           </p>
         </div>
