@@ -3,12 +3,13 @@
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { programs } from '@/lib/content';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/context/language-context';
 import { useEffect, useMemo } from 'react';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const staticTranslations = {
   en: {
@@ -39,7 +40,7 @@ export default function ProgramsPage() {
 
   useEffect(() => {
     const pageTitle = t.title || staticTranslations[language].title;
-    document.title = `${pageTitle} | ${language === 'en' ? 'Grand Coptic Benevolent Society' : 'الجمعية القبطية الخيرية الكبرى'}`;
+    document.title = `${pageTitle} | Grand Coptic Benevolent Society`;
   }, [t, language]);
 
   return (
@@ -61,46 +62,63 @@ export default function ProgramsPage() {
           )}
         </div>
 
-        <div className="mt-12">
-          <Tabs defaultValue={programs[0].id} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-7 h-auto">
-              {programs.map((program) => (
-                <TabsTrigger key={program.id} value={program.id} className="flex flex-col md:flex-row gap-2 h-auto py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                   <program.icon className="h-5 w-5" /> 
-                   <span className="font-medium">{language === 'ar' ? program.titleAr : program.title}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            
+        <div className="mt-16 space-y-12">
             {programs.map((program) => (
-              <TabsContent key={program.id} value={program.id} className="mt-8 rounded-lg border bg-card p-6 lg:p-8">
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-                    <div className="lg:col-span-3">
-                        <h2 className="font-headline text-3xl text-primary">{language === 'ar' ? program.titleAr : program.title}</h2>
-                        <p className="mt-4 text-muted-foreground prose max-w-none">{language === 'ar' ? program.descriptionAr : program.description}</p>
-                    </div>
-                    <div className="lg:col-span-2 grid grid-cols-2 gap-4">
-                        {program.gallery.map(imageId => {
-                            const image = PlaceHolderImages.find(p => p.id === imageId);
-                            if (!image) return null;
-                            return (
-                                <div key={imageId} className="relative aspect-square w-full overflow-hidden rounded-md shadow-md">
-                                    <Image 
-                                        src={image.imageUrl} 
-                                        alt={image.description} 
-                                        fill 
-                                        className="object-cover transition-transform hover:scale-105"
-                                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 20vw, 15vw"
-                                        data-ai-hint={image.imageHint}
-                                    />
-                                </div>
-                            )
-                        })}
-                    </div>
+              <Card key={program.id} id={program.id} className="overflow-hidden shadow-lg">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
+                  <div className="md:col-span-3 p-6 md:p-8 flex flex-col">
+                    <CardHeader className="p-0">
+                      <CardTitle className="font-headline text-3xl text-primary flex items-center gap-4">
+                        <program.icon className="h-8 w-8 text-accent" />
+                        {language === 'ar' ? program.titleAr : program.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0 pt-4 flex-grow">
+                        <p className="text-muted-foreground prose max-w-none">{language === 'ar' ? program.descriptionAr : program.description}</p>
+                    </CardContent>
+                  </div>
+                  <div className="md:col-span-2 relative min-h-[300px] md:min-h-full">
+                     {program.gallery.length > 1 ? (
+                        <Carousel className="w-full h-full">
+                          <CarouselContent className="h-full">
+                            {program.gallery.map(imageId => {
+                                const image = PlaceHolderImages.find(p => p.id === imageId);
+                                if (!image) return null;
+                                return (
+                                    <CarouselItem key={imageId} className="h-full">
+                                        <div className="relative h-full w-full">
+                                            <Image 
+                                                src={image.imageUrl} 
+                                                alt={image.description} 
+                                                fill 
+                                                className="object-cover"
+                                                sizes="(max-width: 768px) 100vw, 40vw"
+                                                data-ai-hint={image.imageHint}
+                                            />
+                                        </div>
+                                    </CarouselItem>
+                                )
+                            })}
+                          </CarouselContent>
+                          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10" />
+                          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10" />
+                        </Carousel>
+                     ) : (
+                       program.gallery.length === 1 && (
+                         <Image 
+                            src={PlaceHolderImages.find(p => p.id === program.gallery[0])?.imageUrl || ''} 
+                            alt={PlaceHolderImages.find(p => p.id === program.gallery[0])?.description || ''} 
+                            fill 
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 40vw"
+                            data-ai-hint={PlaceHolderImages.find(p => p.id === program.gallery[0])?.imageHint}
+                          />
+                       )
+                     )}
+                  </div>
                 </div>
-              </TabsContent>
+              </Card>
             ))}
-          </Tabs>
         </div>
       </div>
     </div>

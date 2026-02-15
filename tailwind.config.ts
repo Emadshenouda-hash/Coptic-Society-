@@ -10,9 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Alegreya', 'serif'],
-        headline: ['Belleza', 'sans-serif'],
-        arabic: ['Cairo', 'sans-serif'],
+        body: ['"EB Garamond"', 'serif'],
+        headline: ['Cinzel', 'serif'],
+        arabic: ['Amiri', 'serif'],
         code: ['monospace'],
         amiri: ['Amiri', 'serif'],
         montserrat: ['Montserrat', 'sans-serif'],
@@ -99,5 +99,5 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 } satisfies Config;

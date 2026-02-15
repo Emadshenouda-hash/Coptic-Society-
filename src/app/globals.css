@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Amiri:wght@700&family=Belleza&family=Cairo:wght@200..1000&family=Cinzel:wght@400..900&family=Montserrat:wght@300;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cinzel:wght@400..900&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Montserrat:wght@300;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -18,8 +18,8 @@
     --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215 20% 65%;
-    --accent: 45 100% 51%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 35 80% 45%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 214 32% 91%;
@@ -53,13 +53,13 @@
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-    --accent: 45 100% 51%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 35 80% 45%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 45 100% 51%;
+    --ring: 35 80% 45%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -84,6 +84,6 @@
     @apply bg-background text-foreground;
   }
   html[dir="rtl"] body {
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Amiri', serif;
   }
 }

@@ -17,7 +17,6 @@ const navLinks = [
   { href: '/governance', en: 'Governance', ar: 'الحوكمة' },
   { href: '/membership', en: 'Membership', ar: 'العضوية' },
   { href: '/bylaws', en: 'Bylaws', ar: 'النظام الأساسي' },
-  // { href: '/news', en: 'News', ar: 'الأخبار' },
   { href: '/contact', en: 'Contact', ar: 'اتصل بنا' },
 ];
 
@@ -51,51 +50,49 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <LanguageSwitcher />
-          {/* <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+        <div className="flex items-center gap-2">
+          <div className="hidden md:flex">
+            <LanguageSwitcher />
+          </div>
+          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Link href="/donate">{donateButtonTranslations[language]}</Link>
-          </Button> */}
-        </div>
-
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Menu className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side={language === 'ar' ? 'right' : 'left'}>
-              <div className="flex h-full flex-col">
-                <div className="border-b p-4">
-                  <span className="font-bold text-lg">Menu</span>
+          </Button>
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-4 w-4" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side={language === 'ar' ? 'right' : 'left'} className="p-0">
+                <div className="flex h-full flex-col">
+                  <div className="border-b p-4">
+                    <span className="font-bold text-lg">Menu</span>
+                  </div>
+                  <nav className="flex flex-col gap-4 p-4 rtl:text-right">
+                    {navLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          'font-medium transition-colors hover:text-primary',
+                          pathname === link.href
+                            ? 'text-primary'
+                            : 'text-muted-foreground'
+                        )}
+                      >
+                        {language === 'ar' ? link.ar : link.en}
+                      </Link>
+                    ))}
+                  </nav>
+                  <div className="mt-auto flex flex-col gap-4 border-t p-4">
+                    <LanguageSwitcher />
+                  </div>
                 </div>
-                <nav className="flex flex-col gap-4 p-4 rtl:text-right">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        'font-medium transition-colors hover:text-primary',
-                        pathname === link.href
-                          ? 'text-primary'
-                          : 'text-muted-foreground'
-                      )}
-                    >
-                      {language === 'ar' ? link.ar : link.en}
-                    </Link>
-                  ))}
-                </nav>
-                <div className="mt-auto flex flex-col gap-4 border-t p-4">
-                  {/* <Button asChild className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                    <Link href="/donate">{donateButtonTranslations[language]}</Link>
-                  </Button> */}
-                  <LanguageSwitcher />
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
