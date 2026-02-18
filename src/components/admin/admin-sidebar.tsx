@@ -24,23 +24,40 @@ import {
 import { useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { usePathname, useRouter } from 'next/navigation';
+import { useLanguage } from '@/context/language-context';
+import { LanguageSwitcher } from '../language-switcher';
 
 const menuItems = [
-    { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/pages', label: 'Page Content', icon: FileText },
-    { href: '/admin/media', label: 'Media Library', icon: ImageIcon },
-    { href: '/admin/news', label: 'News', icon: Newspaper },
-    { href: '/admin/programs', label: 'Programs', icon: HeartHandshake },
-    { href: '/admin/board-members', label: 'Board Members', icon: Users },
-    { href: '/admin/documents', label: 'Documents', icon: FileArchive },
-    { href: '/admin/donations', label: 'Donations', icon: Gift },
-    { href: '/admin/submissions', label: 'Submissions', icon: Inbox },
+    { href: '/admin/dashboard', en: 'Dashboard', ar: 'لوحة التحكم', icon: LayoutDashboard },
+    { href: '/admin/pages', en: 'Page Content', ar: 'محتوى الصفحة', icon: FileText },
+    { href: '/admin/media', en: 'Media Library', ar: 'مكتبة الوسائط', icon: ImageIcon },
+    { href: '/admin/news', en: 'News', ar: 'الأخبار', icon: Newspaper },
+    { href: '/admin/programs', en: 'Programs', ar: 'البرامج', icon: HeartHandshake },
+    { href: '/admin/board-members', en: 'Board Members', ar: 'أعضاء مجلس الإدارة', icon: Users },
+    { href: '/admin/documents', en: 'Documents', ar: 'المستندات', icon: FileArchive },
+    { href: '/admin/donations', en: 'Donations', ar: 'التبرعات', icon: Gift },
+    { href: '/admin/submissions', en: 'Submissions', ar: 'الطلبات', icon: Inbox },
 ];
+
+const translations = {
+  en: {
+    adminPanel: 'Admin Panel',
+    logOut: 'Log Out',
+  },
+  ar: {
+    adminPanel: 'لوحة التحكم',
+    logOut: 'تسجيل الخروج',
+  }
+};
+
 
 export function AdminSidebar() {
   const auth = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const { language } = useLanguage();
+
+  const t = translations[language];
 
   const handleSignOut = async () => {
     try {
@@ -55,32 +72,37 @@ export function AdminSidebar() {
     <Sidebar className="border-r">
        <SidebarHeader className="flex items-center justify-between">
         <h2 className="p-2 text-lg font-semibold tracking-tight">
-          Admin Panel
+          {t.adminPanel}
         </h2>
-        <SidebarTrigger />
+        <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <SidebarTrigger />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {menuItems.map(item => (
+          {menuItems.map(item => {
+            const label = language === 'ar' ? item.ar : item.en;
+            return (
              <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton 
                     onClick={() => router.push(item.href)} 
                     isActive={item.href === '/admin/dashboard' ? pathname === item.href : pathname.startsWith(item.href)} 
-                    tooltip={item.label}
+                    tooltip={label}
                 >
                     <item.icon />
-                    {item.label}
+                    {label}
                 </SidebarMenuButton>
             </SidebarMenuItem>
-          ))}
+          )})}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleSignOut} tooltip="Log Out">
+            <SidebarMenuButton onClick={handleSignOut} tooltip={t.logOut}>
                 <LogOut />
-                Log Out
+                {t.logOut}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -88,5 +110,4 @@ export function AdminSidebar() {
     </Sidebar>
   );
 }
-
     
