@@ -104,16 +104,24 @@ export default function ProgramsPage() {
                           <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10" />
                         </Carousel>
                      ) : (
-                       program.gallery.length === 1 && (
-                         <Image 
-                            src={PlaceHolderImages.find(p => p.id === program.gallery[0])?.imageUrl || ''} 
-                            alt={PlaceHolderImages.find(p => p.id === program.gallery[0])?.description || ''} 
-                            fill 
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 40vw"
-                            data-ai-hint={PlaceHolderImages.find(p => p.id === program.gallery[0])?.imageHint}
-                          />
-                       )
+                       (() => {
+                         if (program.gallery.length === 1) {
+                           const image = PlaceHolderImages.find(p => p.id === program.gallery[0]);
+                           if (image) {
+                             return (
+                               <Image 
+                                 src={image.imageUrl} 
+                                 alt={image.description} 
+                                 fill 
+                                 className="object-cover"
+                                 sizes="(max-width: 768px) 100vw, 40vw"
+                                 data-ai-hint={image.imageHint}
+                               />
+                             );
+                           }
+                         }
+                         return null;
+                       })()
                      )}
                   </div>
                 </div>
