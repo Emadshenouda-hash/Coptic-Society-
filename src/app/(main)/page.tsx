@@ -126,7 +126,7 @@ export default function HomePage() {
                 <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.getInvolved}</h2>
                 <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">{t.getInvolvedSubtitle}</p>
             </div>
-            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
                 {[
                   { title: t.donateNow, desc: t.donateDesc, href: '/donate', icon: Gift },
                   { title: t.becomeMember, desc: t.becomeMemberDesc, href: '/membership', icon: UserPlus },
@@ -159,7 +159,7 @@ export default function HomePage() {
              {isContentLoading ? <Skeleton className="h-10 w-1/2 mx-auto" /> : <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.corePrograms}</h2>}
              {isContentLoading ? <Skeleton className="h-6 w-3/4 mx-auto mt-4" /> : <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">{t.programsSubtitle}</p>}
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
             {programIcons.map((program) => (
               <Card key={program.id} className="text-center transition-all hover:shadow-lg hover:-translate-y-1 flex flex-col">
                 <CardHeader>
