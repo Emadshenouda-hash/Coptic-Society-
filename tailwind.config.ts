@@ -11,12 +11,12 @@ export default {
     extend: {
       fontFamily: {
         body: ['"EB Garamond"', 'serif'],
-        headline: ['Cinzel', 'serif'],
+        headline: ['"Playfair Display"', 'serif'],
         arabic: ['Amiri', 'serif'],
         code: ['monospace'],
         amiri: ['Amiri', 'serif'],
         montserrat: ['Montserrat', 'sans-serif'],
-        cinzel: ['Cinzel', 'serif'],
+        cinzel: ['"Playfair Display"', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
