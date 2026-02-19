@@ -27,26 +27,30 @@ export function BrandHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-24 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto flex h-24 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
         
-        {/* Desktop Navigation - Left */}
-        <nav className="hidden items-center gap-6 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'text-base font-medium transition-colors hover:text-primary',
-                  pathname === link.href ? 'text-primary' : 'text-muted-foreground'
-                )}
-              >
-                {language === 'ar' ? link.ar : link.en}
-              </Link>
-            ))}
-        </nav>
+        {/* --- Desktop Navigation --- */}
+        <div className="hidden w-full items-center md:flex">
+          {/* Left Nav */}
+          <div className="flex flex-1 justify-start">
+            <nav className="flex items-center gap-6">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      'text-base font-medium transition-colors hover:text-primary',
+                      pathname === link.href ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  >
+                    {language === 'ar' ? link.ar : link.en}
+                  </Link>
+                ))}
+            </nav>
+          </div>
 
-        {/* Centered Logo */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex-1 md:flex justify-center">
+          {/* Centered Logo */}
+          <div className="flex-shrink-0">
              <Link href="/" className="flex flex-col items-center text-center">
                 <h1 className={cn("text-xl lg:text-2xl font-bold text-primary", language === 'ar' ? 'font-amiri' : 'font-cinzel')} lang={language}>
                     {language === 'ar' ? 'الجمعية القبطية الخيرية الكبرى' : 'The Grand Coptic Benevolent Society'}
@@ -55,28 +59,31 @@ export function BrandHeader() {
                     FOUNDED BY THE LATE BOUTROS PASHA GHALI
                 </p>
             </Link>
-        </div>
-        
-        {/* Desktop Navigation - Right */}
-        <div className="hidden items-center gap-6 md:flex">
-           <nav className="flex items-center gap-6">
-              {moreNavLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    'text-base font-medium transition-colors hover:text-primary',
-                    pathname === link.href ? 'text-primary' : 'text-muted-foreground'
-                  )}
-                >
-                  {language === 'ar' ? link.ar : link.en}
-                </Link>
-              ))}
-          </nav>
-          <LanguageSwitcher />
+          </div>
+          
+          {/* Right Nav */}
+          <div className="flex flex-1 justify-end">
+            <div className="flex items-center gap-6">
+               <nav className="flex items-center gap-6">
+                  {moreNavLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        'text-base font-medium transition-colors hover:text-primary',
+                        pathname === link.href ? 'text-primary' : 'text-muted-foreground'
+                      )}
+                    >
+                      {language === 'ar' ? link.ar : link.en}
+                    </Link>
+                  ))}
+              </nav>
+              <LanguageSwitcher />
+            </div>
+          </div>
         </div>
 
-        {/* Mobile View */}
+        {/* --- Mobile Navigation --- */}
         <div className="flex w-full items-center justify-between md:hidden">
             <Link href="/" className="flex flex-col items-start text-left">
                 <h1 className={cn("text-lg font-bold text-primary", language === 'ar' ? 'font-amiri' : 'font-cinzel')} lang={language}>
@@ -118,6 +125,7 @@ export function BrandHeader() {
               </SheetContent>
             </Sheet>
         </div>
+
       </div>
     </header>
   );
