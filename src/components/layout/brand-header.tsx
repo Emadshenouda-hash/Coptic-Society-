@@ -8,18 +8,17 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
 import { LanguageSwitcher } from "../language-switcher";
 
+// Consolidate all links into one array for easier management
 const navLinks = [
   { href: '/', en: 'Home', ar: 'الرئيسية' },
   { href: '/about', en: 'About', ar: 'من نحن' },
   { href: '/programs', en: 'Programs', ar: 'برامجنا' },
   { href: '/governance', en: 'Governance', ar: 'الحوكمة' },
+  { href: '/membership', en: 'Membership', ar: 'العضوية' },
+  { href: '/bylaws', en: 'Bylaws', ar: 'النظام الأساسي' },
+  { href: '/contact', en: 'Contact', ar: 'اتصل بنا' },
 ];
 
-const moreNavLinks = [
-    { href: '/membership', en: 'Membership', ar: 'العضوية' },
-    { href: '/bylaws', en: 'Bylaws', ar: 'النظام الأساسي' },
-    { href: '/contact', en: 'Contact', ar: 'اتصل بنا' },
-]
 
 export function BrandHeader() {
   const { language } = useLanguage();
@@ -27,13 +26,25 @@ export function BrandHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-24 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
-        
-        {/* --- Desktop Navigation --- */}
-        <div className="hidden w-full items-center md:flex">
-          {/* Left Nav */}
-          <div className="flex flex-1 justify-start">
-            <nav className="flex items-center gap-6">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {/* --- DESKTOP HEADER --- */}
+        <div className="hidden md:flex flex-col">
+          {/* Top Branding Section */}
+          <div className="flex justify-center py-6">
+            <Link href="/" className="flex flex-col items-center text-center">
+              <h1 className={cn("text-2xl lg:text-3xl font-bold text-primary", language === 'ar' ? 'font-amiri' : 'font-cinzel')} lang={language}>
+                  {language === 'ar' ? 'الجمعية القبطية الخيرية الكبرى' : 'The Grand Coptic Benevolent Society'}
+              </h1>
+              <p className="mt-1 font-montserrat text-xs font-light uppercase tracking-widest text-muted-foreground">
+                  FOUNDED BY THE LATE BOUTROS PASHA GHALI
+              </p>
+            </Link>
+          </div>
+
+          {/* Bottom Navigation Section */}
+          <div className="relative flex h-16 items-center justify-center border-t">
+            <nav className="flex items-center gap-8">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -47,47 +58,17 @@ export function BrandHeader() {
                   </Link>
                 ))}
             </nav>
-          </div>
-
-          {/* Centered Logo */}
-          <div className="flex-shrink-0">
-             <Link href="/" className="flex flex-col items-center text-center">
-                <h1 className={cn("text-xl lg:text-2xl font-bold text-primary", language === 'ar' ? 'font-amiri' : 'font-cinzel')} lang={language}>
-                    {language === 'ar' ? 'الجمعية القبطية الخيرية الكبرى' : 'The Grand Coptic Benevolent Society'}
-                </h1>
-                <p className="hidden sm:block mt-1 font-montserrat text-xs font-light uppercase tracking-widest text-muted-foreground">
-                    FOUNDED BY THE LATE BOUTROS PASHA GHALI
-                </p>
-            </Link>
-          </div>
-          
-          {/* Right Nav */}
-          <div className="flex flex-1 justify-end">
-            <div className="flex items-center gap-6">
-               <nav className="flex items-center gap-6">
-                  {moreNavLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        'text-base font-medium transition-colors hover:text-primary',
-                        pathname === link.href ? 'text-primary' : 'text-muted-foreground'
-                      )}
-                    >
-                      {language === 'ar' ? link.ar : link.en}
-                    </Link>
-                  ))}
-              </nav>
-              <LanguageSwitcher />
+            <div className="absolute right-0">
+                <LanguageSwitcher />
             </div>
           </div>
         </div>
 
-        {/* --- Mobile Navigation --- */}
-        <div className="flex w-full items-center justify-between md:hidden">
+        {/* --- MOBILE HEADER --- */}
+        <div className="flex h-20 items-center justify-between md:hidden">
             <Link href="/" className="flex flex-col items-start text-left">
                 <h1 className={cn("text-lg font-bold text-primary", language === 'ar' ? 'font-amiri' : 'font-cinzel')} lang={language}>
-                    {language === 'ar' ? 'الجمعية القبطية الخيرية الكبرى' : 'The Grand Coptic Benevolent Society'}
+                    {language === 'ar' ? 'الجمعية القبطية' : 'The Coptic Society'}
                 </h1>
             </Link>
             <Sheet>
@@ -103,7 +84,7 @@ export function BrandHeader() {
                     <span className="font-bold text-lg">Menu</span>
                   </div>
                   <nav className="flex flex-col gap-4 p-4 rtl:text-right">
-                    {[...navLinks, ...moreNavLinks].map((link) => (
+                    {navLinks.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
