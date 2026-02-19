@@ -17,7 +17,7 @@ const staticTranslations = {
   en: {
     heroTitle: 'Serving Egypt since 1881',
     heroSubtitle: 'Enhancing social justice and dignity for needy families of all backgrounds across Egypt.',
-    learnMore: 'Learn More',
+    learnMore: 'Learn More About Our Story',
     getInvolved: 'Get Involved',
     getInvolvedSubtitle: 'Your support empowers us to continue our mission. Here’s how you can make a difference.',
     donateNow: 'Donate',
@@ -36,7 +36,7 @@ const staticTranslations = {
   ar: {
     heroTitle: 'نخدم مصر منذ ۱۸۸۱',
     heroSubtitle: 'تعزيز العدالة الاجتماعية والكرامة للأسر المحتاجة من جميع الخلفيات في جميع أنحاء مصر.',
-    learnMore: 'اعرف المزيد',
+    learnMore: 'اعرف المزيد عن قصتنا',
     getInvolved: 'شارك معنا',
     getInvolvedSubtitle: 'دعمكم يمكننا من مواصلة مهمتنا. إليك كيف يمكنك إحداث فرق.',
     donateNow: 'تبرع الآن',
@@ -66,10 +66,9 @@ export default function HomePage() {
   const t = useMemo(() => {
     const dbContent = dynamicContent || {};
     const fallback = staticTranslations[language];
-    // Merge database content with fallback, ensuring no empty strings if DB is missing keys
     const content = language === 'ar' 
-        ? { ...fallback, ...dbContent.contentAr }
-        : { ...fallback, ...dbContent.contentEn };
+        ? { ...fallback, ...(dbContent.contentAr || {}) }
+        : { ...fallback, ...(dbContent.contentEn || {}) };
     return content;
   }, [dynamicContent, language]);
   
@@ -81,37 +80,37 @@ export default function HomePage() {
   return (
     <div className="flex-1" dir={direction}>
       {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[400px] w-full">
+      <section className="relative h-[70vh] min-h-[500px] w-full">
         {heroImage && (
           <Image
             src={heroImage.imageUrl}
             alt={heroImage.description}
             fill
-            className="object-cover brightness-105 contrast-125"
+            className="object-cover brightness-75"
             priority
             data-ai-hint={heroImage.imageHint}
           />
         )}
-        <div className="absolute inset-0 bg-primary/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/50 to-transparent" />
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-primary-foreground">
-          <div className="container px-4 sm:px-6 lg:px-8">
+          <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
             {isContentLoading ? (
                 <div className='space-y-4'>
-                    <Skeleton className="h-16 w-full max-w-4xl mx-auto bg-primary-foreground/20" />
-                    <Skeleton className="h-6 w-full max-w-2xl mx-auto bg-primary-foreground/20" />
+                    <Skeleton className="h-20 w-full max-w-4xl mx-auto bg-primary-foreground/20" />
+                    <Skeleton className="h-8 w-full max-w-2xl mx-auto bg-primary-foreground/20" />
                 </div>
             ) : (
                 <>
-                    <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl">
+                    <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-wider text-white shadow-lg">
                         {t.heroTitle}
                     </h1>
-                    <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl font-body">
+                    <p className="mt-6 max-w-3xl mx-auto text-xl md:text-2xl text-white/90">
                         {t.heroSubtitle}
                     </p>
                 </>
             )}
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Button size="lg" variant="outline" asChild className="border-primary-foreground text-primary-foreground bg-transparent hover:bg-primary-foreground hover:text-primary">
+            <div className="mt-10">
+              <Button size="lg" asChild className="text-lg px-10 py-6 bg-accent text-accent-foreground hover:bg-accent/90 focus-visible:ring-white">
                 <Link href="/about">{t.learnMore}</Link>
               </Button>
             </div>
@@ -120,31 +119,32 @@ export default function HomePage() {
       </section>
       
       {/* Get Involved Section */}
-      <section className="py-16 lg:py-24 bg-secondary">
-        <div className="container px-4 sm:px-6 lg:px-8">
+      <section className="py-20 lg:py-28 bg-secondary">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-                <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.getInvolved}</h2>
-                <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">{t.getInvolvedSubtitle}</p>
+                <h2 className="font-headline text-4xl md:text-5xl text-primary">{t.getInvolved}</h2>
+                <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">{t.getInvolvedSubtitle}</p>
             </div>
-            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
                 {[
-                  { title: t.donateNow, desc: t.donateDesc, href: '/donate', icon: Gift },
                   { title: t.becomeMember, desc: t.becomeMemberDesc, href: '/membership', icon: UserPlus },
                   { title: t.volunteer, desc: t.volunteerDesc, href: '/contact', icon: HandHeart },
                   { title: t.requestAssistance, desc: t.requestAssistanceDesc, href: '/programs', icon: HelpCircle },
-                ].filter(item => item.href !== '/donate').map(item => (
-                  <Card key={item.href} className="text-center transition-all hover:shadow-lg hover:-translate-y-1 flex flex-col">
-                      <CardHeader>
-                          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent">
-                              <item.icon className="h-8 w-8" />
+                ].map(item => (
+                  <Card key={item.href} className="text-center transition-all hover:shadow-xl hover:-translate-y-2 flex flex-col p-4">
+                      <CardHeader className="pt-8">
+                          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-accent/10 text-accent">
+                              <item.icon className="h-10 w-10" />
                           </div>
-                          <CardTitle className="font-headline pt-4">{item.title}</CardTitle>
+                          <CardTitle className="font-headline pt-6 text-2xl">{item.title}</CardTitle>
                       </CardHeader>
                       <CardContent className="flex flex-col flex-grow">
-                          <p className="text-muted-foreground text-sm flex-grow">{item.desc}</p>
-                          <Button variant="link" asChild className="mt-auto pt-4 text-accent hover:text-accent/80">
-                            <Link href={item.href}>{t.readMore} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
-                          </Button>
+                          <p className="text-muted-foreground text-base flex-grow">{item.desc}</p>
+                           <div className="mt-6">
+                             <Button variant="outline" asChild className="text-base">
+                                <Link href={item.href}>{t.readMore} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
+                            </Button>
+                           </div>
                       </CardContent>
                   </Card>
                 ))}
@@ -153,32 +153,34 @@ export default function HomePage() {
       </section>
 
       {/* Programs Section */}
-      <section className="py-16 lg:py-24 bg-background">
-        <div className="container px-4 sm:px-6 lg:px-8">
+      <section className="py-20 lg:py-28 bg-background">
+        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-             {isContentLoading ? <Skeleton className="h-10 w-1/2 mx-auto" /> : <h2 className="font-headline text-3xl md:text-4xl text-primary">{t.corePrograms}</h2>}
-             {isContentLoading ? <Skeleton className="h-6 w-3/4 mx-auto mt-4" /> : <p className="mt-4 max-w-3xl mx-auto text-muted-foreground">{t.programsSubtitle}</p>}
+             {isContentLoading ? <Skeleton className="h-12 w-1/2 mx-auto" /> : <h2 className="font-headline text-4xl md:text-5xl text-primary">{t.corePrograms}</h2>}
+             {isContentLoading ? <Skeleton className="h-7 w-3/4 mx-auto mt-4" /> : <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">{t.programsSubtitle}</p>}
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
             {programIcons.map((program) => (
-              <Card key={program.id} className="text-center transition-all hover:shadow-lg hover:-translate-y-1 flex flex-col">
-                <CardHeader>
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent">
-                    <program.icon className="h-8 w-8" />
+              <Card key={program.id} className="text-center transition-all hover:shadow-xl hover:-translate-y-2 flex flex-col p-4">
+                <CardHeader className="pt-8">
+                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-accent/10 text-accent">
+                    <program.icon className="h-10 w-10" />
                   </div>
-                  <CardTitle className="font-headline pt-4">{language === 'ar' ? program.titleAr : program.title}</CardTitle>
+                  <CardTitle className="font-headline pt-6 text-2xl">{language === 'ar' ? program.titleAr : program.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col flex-grow">
-                  <p className="text-muted-foreground text-sm flex-grow">{(language === 'ar' ? program.descriptionAr : program.description).substring(0, 100)}...</p>
-                  <Button variant="link" asChild className="mt-auto pt-4 text-accent hover:text-accent/80">
-                    <Link href={`/programs#${program.id}`}>{t.readMore} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
-                  </Button>
+                  <p className="text-muted-foreground text-base flex-grow">{(language === 'ar' ? program.descriptionAr : program.description).substring(0, 120)}...</p>
+                  <div className="mt-6">
+                    <Button variant="outline" asChild className="text-base">
+                        <Link href={`/programs#${program.id}`}>{t.readMore} <ArrowRight className="ml-2 h-4 w-4 rtl:mr-2 rtl:ml-0" /></Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-           <div className="text-center mt-12">
-            <Button asChild size="lg">
+           <div className="text-center mt-16">
+            <Button asChild size="lg" className="text-lg px-10 py-6">
               <Link href="/programs">{t.viewAllPrograms}</Link>
             </Button>
           </div>
