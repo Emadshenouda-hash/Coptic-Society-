@@ -12,6 +12,11 @@ const translations = {
     donate: 'Donate',
     contact: 'Contact',
     contactUs: 'Contact Us',
+    addressLine1: '175 Ramsis Street, Cairo, Egypt',
+    addressLine2: 'P.O. Box 47, Fagalah, Cairo, Egypt',
+    phone1: '+20 2 591 2234',
+    phone2: '+20 2 591 4047',
+    emailAddress: 'info@coptic-society.org',
     copyright: 'Grand Coptic Benevolent Society. All rights reserved.',
     description: 'A charitable, non-profit organisation founded in 1881 to serve needy families, enhance social justice, and promote cultural awareness.',
   },
@@ -22,6 +27,11 @@ const translations = {
     donate: 'تبرع',
     contact: 'اتصل بنا',
     contactUs: 'اتصل بنا',
+    addressLine1: '١٧٥ شارع رمسيس، القاهرة، مصر',
+    addressLine2: 'ص.ب ٤٧، الفجالة، القاهرة، مصر',
+    phone1: '+٢٠ ٢ ٥٩١ ٢٢٣٤',
+    phone2: '+٢٠ ٢ ٥٩١ ٤٠٤٧',
+    emailAddress: 'info@coptic-society.org',
     copyright: 'الجمعية القبطية الخيرية الكبرى. جميع الحقوق محفوظة.',
     description: 'جمعية خيرية غير هادفة للربح تأسست عام 1881 لخدمة الأسر المحتاجة وتعزيز العدالة الاجتماعية والوعي الثقافي.',
   }
@@ -59,20 +69,20 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="mt-1 h-4 w-4 flex-shrink-0" />
                 <div>
-                  <p>175 Ramsis Street, Cairo, Egypt</p>
-                  <p>P.O. Box 47, Fagalah, Cairo, Egypt</p>
+                  <p>{t.addressLine1}</p>
+                  <p>{t.addressLine2}</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="h-4 w-4 flex-shrink-0 mt-1" />
                  <div>
-                    <a href="tel:+2025912234" className="hover:text-primary transition-colors block">+20 2 591 2234</a>
-                    <a href="tel:+2025914047" className="hover:text-primary transition-colors block">+20 2 591 4047</a>
+                    <a href={`tel:${translations.en.phone1}`} className="hover:text-primary transition-colors block">{t.phone1}</a>
+                    <a href={`tel:${translations.en.phone2}`} className="hover:text-primary transition-colors block">{t.phone2}</a>
                 </div>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 flex-shrink-0" />
-                <a href="mailto:info@coptic-society.org" className="hover:text-primary transition-colors">info@coptic-society.org</a>
+                <a href={`mailto:${t.emailAddress}`} className="hover:text-primary transition-colors">{t.emailAddress}</a>
               </li>
             </ul>
           </div>
