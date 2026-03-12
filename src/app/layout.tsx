@@ -3,10 +3,10 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/components/providers';
 
-const VERCEL_URL = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:9002';
+const SITE_URL = 'https://www.coptic-society.org';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(VERCEL_URL),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Grand Coptic Benevolent Society | الجمعية القبطية الخيرية الكبرى',
     template: `%s | Grand Coptic Benevolent Society`,
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Grand Coptic Benevolent Society',
     description: 'Serving Egypt since 1881. A charitable, non-profit organisation dedicated to social justice.',
-    url: VERCEL_URL,
+    url: SITE_URL,
     siteName: 'Grand Coptic Benevolent Society',
     images: [
       {
@@ -57,8 +57,8 @@ const organizationSchema = {
   "@type": "Organization",
   "name": "The Grand Coptic Benevolent Society",
   "alternateName": "الجمعية القبطية الخيرية الكبرى",
-  "url": VERCEL_URL,
-  "logo": `${VERCEL_URL}/assets/gcbs-historic-building.jpg`,
+  "url": SITE_URL,
+  "logo": `${SITE_URL}/assets/gcbs-historic-building.jpg`,
   "foundingDate": "1881",
   "address": {
     "@type": "PostalAddress",
