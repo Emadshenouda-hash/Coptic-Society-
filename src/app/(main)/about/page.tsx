@@ -8,6 +8,8 @@ import { useEffect, useMemo } from 'react';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SectionBadge } from '@/components/ui/section-badge';
+import { FadeIn } from '@/components/fade-in';
 
 
 const staticTranslations = {
@@ -37,7 +39,6 @@ const staticTranslations = {
   }
 };
 
-
 export default function AboutPage() {
   const { language, direction } = useLanguage();
   const firestore = useFirestore();
@@ -50,8 +51,11 @@ export default function AboutPage() {
   const { data: dynamicContent, isLoading } = useDoc(contentRef);
   
   const t = useMemo(() => {
-    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : {};
-    return { ...staticTranslations[language], ...content };
+    const dbContent = dynamicContent || {};
+    const fallback = staticTranslations[language];
+    return language === 'ar' 
+        ? { ...fallback, ...(dbContent.contentAr || {}) }
+        : { ...fallback, ...(dbContent.contentEn || {}) };
   }, [dynamicContent, language]);
 
   const heritageImage = PlaceHolderImages.find(img => img.id === 'about-heritage');
@@ -62,26 +66,27 @@ export default function AboutPage() {
   }, [t, language]);
 
   return (
-    <div className="bg-background" dir={direction}>
+    <div className="bg-secondary" dir={direction}>
       <div className="container px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div className="text-center">
-        {isLoading ? (
-            <>
-                <Skeleton className="h-12 w-3/4 mx-auto" />
-                <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
-            </>
-        ) : (
-            <>
-                <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
-                <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
-                    {t.pageSubtitle}
-                </p>
-            </>
-        )}
-        </div>
+        <FadeIn className="text-center mb-16 space-y-4">
+          <SectionBadge>{t.title}</SectionBadge>
+          {isLoading ? (
+              <>
+                  <Skeleton className="h-12 w-3/4 mx-auto" />
+                  <Skeleton className="h-6 w-full max-w-3xl mx-auto mt-4" />
+              </>
+          ) : (
+              <>
+                  <h1 className="font-headline text-4xl md:text-5xl text-primary">{t.pageTitle}</h1>
+                  <p className="mt-4 max-w-3xl mx-auto text-lg text-muted-foreground">
+                      {t.pageSubtitle}
+                  </p>
+              </>
+          )}
+        </FadeIn>
 
-        <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-2 items-center">
-           <div className="prose prose-lg max-w-none text-foreground" dir={direction}>
+        <FadeIn className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-2 items-center" delay="200ms">
+           <div className="prose prose-lg max-w-none text-muted-foreground" dir={direction}>
             {isLoading ? (
                 <div className="space-y-8">
                     <Skeleton className="h-8 w-1/3" />
@@ -99,7 +104,7 @@ export default function AboutPage() {
             )}
            </div>
           {heritageImage && (
-            <div className="relative h-96 w-full rounded-lg shadow-lg overflow-hidden">
+            <div className="relative h-96 w-full rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105">
                <Image
                 src={heritageImage.imageUrl}
                 alt={heritageImage.description}
@@ -109,10 +114,10 @@ export default function AboutPage() {
               />
             </div>
           )}
-        </div>
+        </FadeIn>
 
-        <div className="mt-20">
-            <Card className="bg-secondary">
+        <FadeIn className="mt-20" delay="400ms">
+            <Card className="bg-background transition-shadow duration-300 hover:shadow-xl">
                 <CardHeader>
                     {isLoading ? <Skeleton className="h-8 w-1/2" /> : <CardTitle className="font-headline text-2xl text-primary">{t.registration}</CardTitle>}
                 </CardHeader>
@@ -120,7 +125,7 @@ export default function AboutPage() {
                     {isLoading ? <Skeleton className="h-10 w-full" /> : <p className="text-muted-foreground">{t.registrationText}</p>}
                 </CardContent>
             </Card>
-        </div>
+        </FadeIn>
       </div>
     </div>
   );

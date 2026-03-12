@@ -10,6 +10,9 @@ import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { SectionBadge } from '@/components/ui/section-badge';
+import { FadeIn } from '@/components/fade-in';
+import { cn } from '@/lib/utils';
 
 const staticTranslations = {
   en: {
@@ -26,6 +29,16 @@ const staticTranslations = {
   }
 };
 
+const cardColors = [
+    'border-accent',
+    'border-blue-300',
+    'border-green-300',
+    'border-purple-300',
+    'border-orange-300',
+    'border-teal-300',
+    'border-pink-300',
+];
+
 export default function ProgramsPage() {
   const { language, direction } = useLanguage();
   
@@ -34,8 +47,11 @@ export default function ProgramsPage() {
   const { data: dynamicContent, isLoading } = useDoc(contentRef);
 
   const t = useMemo(() => {
-    const content = dynamicContent ? (language === 'ar' ? dynamicContent.contentAr : dynamicContent.contentEn) : {};
-    return { ...staticTranslations[language], ...content };
+    const dbContent = dynamicContent || {};
+    const fallback = staticTranslations[language];
+    return language === 'ar' 
+        ? { ...fallback, ...(dbContent.contentAr || {}) }
+        : { ...fallback, ...(dbContent.contentEn || {}) };
   }, [dynamicContent, language]);
 
   useEffect(() => {
@@ -44,9 +60,10 @@ export default function ProgramsPage() {
   }, [t, language]);
 
   return (
-    <div className="bg-background" dir={direction}>
+    <div className="bg-secondary" dir={direction}>
       <div className="container px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div className="text-center">
+        <FadeIn className="text-center mb-16 space-y-4">
+          <SectionBadge>{t.title}</SectionBadge>
           {isLoading ? (
                 <>
                     <Skeleton className="h-12 w-3/4 mx-auto" />
@@ -60,72 +77,74 @@ export default function ProgramsPage() {
                   </p>
                 </>
           )}
-        </div>
+        </FadeIn>
 
-        <div className="mt-16 space-y-12">
-            {programs.map((program) => (
-              <Card key={program.id} id={program.id} className="overflow-hidden shadow-lg">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
-                  <div className="md:col-span-3 p-6 md:p-8 flex flex-col">
-                    <CardHeader className="p-0">
-                      <CardTitle className="font-headline text-3xl text-primary flex items-center gap-4">
-                        <program.icon className="h-8 w-8 text-accent" />
-                        {language === 'ar' ? program.titleAr : program.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0 pt-4 flex-grow">
-                        <p className="text-muted-foreground prose max-w-none">{language === 'ar' ? program.descriptionAr : program.description}</p>
-                    </CardContent>
-                  </div>
-                  <div className="md:col-span-2 relative min-h-[300px] md:min-h-full">
-                     {program.gallery.length > 1 ? (
-                        <Carousel className="w-full h-full">
-                          <CarouselContent className="h-full">
-                            {program.gallery.map(imageId => {
-                                const image = PlaceHolderImages.find(p => p.id === imageId);
-                                if (!image) return null;
-                                return (
-                                    <CarouselItem key={imageId} className="h-full">
-                                        <div className="relative h-full w-full">
-                                            <Image 
-                                                src={image.imageUrl} 
-                                                alt={image.description} 
-                                                fill 
-                                                className="object-cover"
-                                                sizes="(max-width: 768px) 100vw, 40vw"
-                                                data-ai-hint={image.imageHint}
-                                            />
-                                        </div>
-                                    </CarouselItem>
-                                )
-                            })}
-                          </CarouselContent>
-                          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10" />
-                          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10" />
-                        </Carousel>
-                     ) : (
-                       (() => {
-                         if (program.gallery.length === 1) {
-                           const image = PlaceHolderImages.find(p => p.id === program.gallery[0]);
-                           if (image) {
-                             return (
-                               <Image 
-                                 src={image.imageUrl} 
-                                 alt={image.description} 
-                                 fill 
-                                 className="object-cover"
-                                 sizes="(max-width: 768px) 100vw, 40vw"
-                                 data-ai-hint={image.imageHint}
-                               />
-                             );
+        <div className="space-y-12">
+            {programs.map((program, index) => (
+              <FadeIn key={program.id} delay={`${index * 100}ms`}>
+                <Card id={program.id} className={cn("overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-t-4", cardColors[index % cardColors.length])}>
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
+                    <div className="md:col-span-3 p-6 md:p-8 flex flex-col">
+                      <CardHeader className="p-0">
+                        <CardTitle className="font-headline text-3xl text-primary flex items-center gap-4">
+                          <program.icon className="h-8 w-8 text-accent" />
+                          {language === 'ar' ? program.titleAr : program.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-0 pt-4 flex-grow">
+                          <p className="text-muted-foreground prose max-w-none">{language === 'ar' ? program.descriptionAr : program.description}</p>
+                      </CardContent>
+                    </div>
+                    <div className="md:col-span-2 relative min-h-[300px] md:min-h-full">
+                       {program.gallery.length > 1 ? (
+                          <Carousel className="w-full h-full">
+                            <CarouselContent className="h-full">
+                              {program.gallery.map(imageId => {
+                                  const image = PlaceHolderImages.find(p => p.id === imageId);
+                                  if (!image) return null;
+                                  return (
+                                      <CarouselItem key={imageId} className="h-full">
+                                          <div className="relative h-full w-full">
+                                              <Image 
+                                                  src={image.imageUrl} 
+                                                  alt={image.description} 
+                                                  fill 
+                                                  className="object-cover"
+                                                  sizes="(max-width: 768px) 100vw, 40vw"
+                                                  data-ai-hint={image.imageHint}
+                                              />
+                                          </div>
+                                      </CarouselItem>
+                                  )
+                              })}
+                            </CarouselContent>
+                            <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10" />
+                            <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10" />
+                          </Carousel>
+                       ) : (
+                         (() => {
+                           if (program.gallery.length === 1) {
+                             const image = PlaceHolderImages.find(p => p.id === program.gallery[0]);
+                             if (image) {
+                               return (
+                                 <Image 
+                                   src={image.imageUrl} 
+                                   alt={image.description} 
+                                   fill 
+                                   className="object-cover"
+                                   sizes="(max-width: 768px) 100vw, 40vw"
+                                   data-ai-hint={image.imageHint}
+                                 />
+                               );
+                             }
                            }
-                         }
-                         return null;
-                       })()
-                     )}
+                           return null;
+                         })()
+                       )}
+                    </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              </FadeIn>
             ))}
         </div>
       </div>

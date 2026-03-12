@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     siteName: 'Grand Coptic Benevolent Society',
     images: [
       {
-        url: '/og-image.jpg', // Path to your OG image in the `public` folder
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
       },
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Grand Coptic Benevolent Society',
     description: 'Serving Egypt since 1881. A charitable, non-profit organisation dedicated to social justice.',
-    // images: ['/twitter-image.jpg'], // Path to your Twitter image
+    images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
@@ -47,8 +47,6 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
-    // shortcut: '/favicon-16x16.png',
-    // apple: '/apple-touch-icon.png',
   },
 };
 
@@ -74,21 +72,20 @@ const organizationSchema = {
   "sameAs": []
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html>
+    <html lang="en" className="scroll-smooth">
       <head>
         <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-sans antialiased">
         <Providers>
           {children}
         </Providers>

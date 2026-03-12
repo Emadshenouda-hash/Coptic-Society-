@@ -10,13 +10,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"EB Garamond"', 'serif'],
+        sans: ['Inter', 'sans-serif'],
         headline: ['"Playfair Display"', 'serif'],
-        arabic: ['Amiri', 'serif'],
-        code: ['monospace'],
         amiri: ['Amiri', 'serif'],
         montserrat: ['Montserrat', 'sans-serif'],
-        cinzel: ['"Playfair Display"', 'serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
