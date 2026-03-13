@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Menu, Heart } from "lucide-react";
 import { LanguageSwitcher } from "../language-switcher";
+import { Logo } from "../logo";
 
 const navLinks = [
   { href: '/', en: 'Home', ar: 'الرئيسية' },
@@ -30,13 +31,16 @@ export function BrandHeader() {
         <div className="hidden md:flex flex-col">
           {/* Top Branding Section */}
           <div className="flex justify-center items-center py-4">
-            <Link href="/" className="flex flex-col items-center text-center">
-              <h1 className={cn("text-3xl font-bold text-primary font-headline")} lang={language}>
-                  {language === 'ar' ? 'الجمعية القبطية الخيرية الكبرى' : 'The Grand Coptic Benevolent Society'}
-              </h1>
-              <p className="mt-1 font-montserrat text-xs font-light uppercase tracking-widest text-muted-foreground">
-                  FOUNDED BY THE LATE BOUTROS PASHA GHALI
-              </p>
+            <Link href="/" className="flex items-center gap-4 text-center">
+              <Logo size={48} variant="icon" theme="light" />
+              <div className="flex flex-col items-center">
+                <h1 className={cn("text-3xl font-bold text-primary font-headline")} lang={language}>
+                    {language === 'ar' ? 'الجمعية القبطية الخيرية الكبرى' : 'The Grand Coptic Benevolent Society'}
+                </h1>
+                <p className="mt-1 font-montserrat text-xs font-light uppercase tracking-widest text-muted-foreground">
+                    FOUNDED BY THE LATE BOUTROS PASHA GHALI
+                </p>
+              </div>
             </Link>
           </div>
 
@@ -70,7 +74,8 @@ export function BrandHeader() {
 
         {/* --- MOBILE HEADER --- */}
         <div className="flex h-20 items-center justify-between md:hidden">
-            <Link href="/" className="flex flex-col items-start text-left">
+            <Link href="/" className="flex items-center gap-2 text-left">
+                <Logo size={36} variant="icon" theme="light" />
                 <h1 className={cn("text-lg font-bold text-primary font-headline")} lang={language}>
                     {language === 'ar' ? 'الجمعية القبطية' : 'The Coptic Society'}
                 </h1>

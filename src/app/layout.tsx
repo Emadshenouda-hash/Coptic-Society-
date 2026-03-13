@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     description: 'Serving Egypt since 1881. A charitable, non-profit organisation dedicated to social justice.',
     url: SITE_URL,
     siteName: 'Grand Coptic Benevolent Society',
+    // TODO: Update /public/og-image.jpg with new branding
     images: [
       {
         url: '/og-image.jpg',
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.svg',
   },
 };
 

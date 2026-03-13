@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
+import { Logo } from '../logo';
 
 const translations = {
   en: {
@@ -52,9 +53,12 @@ export function Footer() {
       <div className="container px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4 rtl:text-right">
           <div className="md:col-span-2">
-            <div className="space-y-2">
-                <p className="font-amiri text-3xl font-bold text-accent" lang="ar">الجمعية القبطية الخيرية الكبرى</p>
-                <p className="font-headline text-lg font-bold uppercase tracking-wider text-accent">The Grand Coptic Benevolent Society</p>
+            <div className="flex items-center gap-4">
+              <Logo size={56} variant="icon" theme="dark" />
+              <div className="space-y-1">
+                  <p className="font-amiri text-3xl font-bold text-accent" lang="ar">الجمعية القبطية الخيرية الكبرى</p>
+                  <p className="font-headline text-lg font-bold uppercase tracking-wider text-accent">The Grand Coptic Benevolent Society</p>
+              </div>
             </div>
             <p className="mt-4 max-w-md text-sm text-primary-foreground/80">
               {t.description}
