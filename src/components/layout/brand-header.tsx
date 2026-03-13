@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Menu, Heart } from "lucide-react";
 import { LanguageSwitcher } from "../language-switcher";
 import { Logo } from "../logo";
@@ -96,9 +96,9 @@ export function BrandHeader() {
                 </SheetTrigger>
                 <SheetContent side={language === 'ar' ? 'right' : 'left'} className="w-full max-w-sm p-0 bg-secondary">
                   <div className="flex h-full flex-col">
-                    <div className="border-b p-4">
-                      <span className="font-bold text-lg">{language === 'ar' ? 'القائمة' : 'Menu'}</span>
-                    </div>
+                    <SheetHeader className="border-b p-4 text-left rtl:text-right">
+                      <SheetTitle className="font-bold text-lg">{language === 'ar' ? 'القائمة' : 'Menu'}</SheetTitle>
+                    </SheetHeader>
                     <nav className="flex flex-col gap-4 p-4 rtl:text-right">
                       {navLinks.map((link) => (
                         <Link
