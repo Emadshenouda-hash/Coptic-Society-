@@ -10,10 +10,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        headline: ['"Playfair Display"', 'serif'],
-        amiri: ['Amiri', 'serif'],
-        montserrat: ['Montserrat', 'sans-serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
+        headline: ['var(--font-playfair)', 'serif'],
+        amiri: ['var(--font-amiri)', 'serif'],
+        montserrat: ['var(--font-montserrat)', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

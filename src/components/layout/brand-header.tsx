@@ -46,11 +46,12 @@ export function BrandHeader() {
 
           {/* Bottom Navigation Section */}
           <div className="relative flex h-16 items-center justify-center border-t border-black/10">
-            <nav className="flex items-center gap-8">
+            <nav aria-label="Main navigation" className="flex items-center gap-8">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
+                    aria-current={pathname === link.href ? 'page' : undefined}
                     className={cn(
                       'text-base font-medium transition-colors hover:text-accent',
                       pathname === link.href ? 'text-primary font-semibold' : 'text-muted-foreground'
@@ -99,11 +100,12 @@ export function BrandHeader() {
                     <SheetHeader className="border-b p-4 text-left rtl:text-right">
                       <SheetTitle className="font-bold text-lg">{language === 'ar' ? 'القائمة' : 'Menu'}</SheetTitle>
                     </SheetHeader>
-                    <nav className="flex flex-col gap-4 p-4 rtl:text-right">
+                    <nav aria-label="Mobile navigation" className="flex flex-col gap-4 p-4 rtl:text-right">
                       {navLinks.map((link) => (
                         <Link
                           key={link.href}
                           href={link.href}
+                          aria-current={pathname === link.href ? 'page' : undefined}
                           className={cn(
                             'text-lg font-medium transition-colors hover:text-accent',
                             pathname === link.href

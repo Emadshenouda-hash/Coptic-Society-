@@ -34,12 +34,18 @@ service cloud.firestore {
     }
     match /contact_submissions/{submissionId} {
       allow get, list: if isAdmin();
-      allow create: if true;
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 200
+        && request.resource.data.email is string && request.resource.data.email.size() <= 200
+        && request.resource.data.message is string && request.resource.data.message.size() <= 5000;
       allow update, delete: if isAdmin();
     }
     match /donations/{donationId} {
       allow get, list: if isAdmin();
-      allow create: if true;
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'amount'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 200
+        && request.resource.data.email is string && request.resource.data.email.size() <= 200
+        && request.resource.data.amount is number && request.resource.data.amount > 0;
       allow update, delete: if isAdmin();
     }
     match /documents/{documentId} {
