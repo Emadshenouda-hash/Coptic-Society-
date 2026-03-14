@@ -25,11 +25,11 @@ export function useAdminAuth() {
   // Create a memoized reference to the user's role document.
   // This prevents re-running the doc subscription on every render.
   const adminRoleRef = useMemoFirebase(() => {
-    if (user) {
+    if (user && firestore) {
       // The path to the document is `/roles_admin/{user.uid}`.
       return doc(firestore, 'roles_admin', user.uid);
     }
-    // If there's no user, there's no role to check.
+    // If there's no user or Firestore isn't ready, there's no role to check.
     return null;
   }, [user, firestore]);
 
