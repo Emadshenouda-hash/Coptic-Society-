@@ -143,7 +143,7 @@ export function MembershipClient() {
                         <AccordionContent className="prose max-w-none text-muted-foreground" dir={direction}>
                           <p>{t.eligibilityIntro}</p>
                           <ul>
-                            {(t.eligibilityCriteria || '').split('\n').map((item, i) => <li key={i}>{item}</li>)}
+                            {(t.eligibilityCriteria || '').split('\n').map((item: string, i: number) => <li key={i}>{item}</li>)}
                           </ul>
                         </AccordionContent>
                       </AccordionItem>
@@ -153,11 +153,11 @@ export function MembershipClient() {
                           <p>{t.rightsObligationsIntro}</p>
                           <strong>{t.rights}</strong>
                            <ul>
-                            {(t.rightsList || '').split('\n').map((item, i) => <li key={i}>{item}</li>)}
+                            {(t.rightsList || '').split('\n').map((item: string, i: number) => <li key={i}>{item}</li>)}
                           </ul>
                           <strong>{t.obligations}</strong>
                            <ul>
-                            {(t.obligationsList || '').split('\n').map((item, i) => <li key={i}>{item}</li>)}
+                            {(t.obligationsList || '').split('\n').map((item: string, i: number) => <li key={i}>{item}</li>)}
                           </ul>
                         </AccordionContent>
                       </AccordionItem>
@@ -166,7 +166,7 @@ export function MembershipClient() {
                         <AccordionContent className="prose max-w-none text-muted-foreground" dir={direction}>
                           <p>{t.terminationIntro}</p>
                            <ul>
-                            {(t.terminationReasons || '').split('\n').map((item, i) => <li key={i}>{item}</li>)}
+                            {(t.terminationReasons || '').split('\n').map((item: string, i: number) => <li key={i}>{item}</li>)}
                           </ul>
                         </AccordionContent>
                       </AccordionItem>

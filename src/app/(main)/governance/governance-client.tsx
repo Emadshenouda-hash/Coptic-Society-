@@ -137,7 +137,7 @@ export function GovernanceClient() {
                         <p>{t.generalAssemblyDesc}</p>
                         <strong>{t.keyDuties}</strong>
                         <ul>
-                            {(t.generalAssemblyDuties || '').split('\n').map((duty, i) => <li key={i}>{duty}</li>)}
+                            {(t.generalAssemblyDuties || '').split('\n').map((duty: string, i: number) => <li key={i}>{duty}</li>)}
                         </ul>
                     </>
                 )}
@@ -162,7 +162,7 @@ export function GovernanceClient() {
                         <p>{t.boardOfDirectorsDesc}</p>
                         <strong>{t.keyDuties}</strong>
                         <ul>
-                            {(t.boardOfDirectorsDuties || '').split('\n').map((duty, i) => <li key={i}>{duty}</li>)}
+                            {(t.boardOfDirectorsDuties || '').split('\n').map((duty: string, i: number) => <li key={i}>{duty}</li>)}
                         </ul>
                     </>
                 )}
