@@ -1,7 +1,35 @@
 import type { Metadata } from 'next';
+import { Inter, Playfair_Display, Amiri, Montserrat } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/components/providers';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+});
+
+const amiri = Amiri({
+  subsets: ['arabic', 'latin'],
+  variable: '--font-amiri',
+  display: 'swap',
+  weight: ['400', '700'],
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
 
 const SITE_URL = 'https://www.coptic-society.org';
 
@@ -18,7 +46,6 @@ export const metadata: Metadata = {
     description: 'Serving Egypt since 1881. A charitable, non-profit organisation dedicated to social justice.',
     url: SITE_URL,
     siteName: 'Grand Coptic Benevolent Society',
-    // TODO: Update /public/og-image.jpg with new branding
     images: [
       {
         url: '/og-image.jpg',
@@ -57,7 +84,7 @@ const organizationSchema = {
   "name": "The Grand Coptic Benevolent Society",
   "alternateName": "الجمعية القبطية الخيرية الكبرى",
   "url": SITE_URL,
-  "logo": `${SITE_URL}/assets/gcbs-historic-building.jpg`,
+  "logo": `${SITE_URL}/favicon.svg`,
   "foundingDate": "1881",
   "address": {
     "@type": "PostalAddress",
@@ -79,7 +106,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html
+      lang="en"
+      className={`scroll-smooth ${inter.variable} ${playfairDisplay.variable} ${amiri.variable} ${montserrat.variable}`}
+    >
       <head>
         <script
             type="application/ld+json"

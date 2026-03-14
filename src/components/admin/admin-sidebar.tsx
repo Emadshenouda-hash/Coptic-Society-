@@ -60,6 +60,7 @@ export function AdminSidebar() {
   const t = translations[language];
 
   const handleSignOut = async () => {
+    if (!auth) return;
     try {
       await signOut(auth);
       router.replace('/admin/login');

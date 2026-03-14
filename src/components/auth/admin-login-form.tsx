@@ -34,6 +34,7 @@ export function AdminLoginForm() {
   });
 
   const onSubmit = async (values: FormValues) => {
+    if (!auth) return;
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
