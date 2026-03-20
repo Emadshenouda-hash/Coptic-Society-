@@ -86,18 +86,12 @@ export default function RootLayout({
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-      </head>
-      <body className="font-sans antialiased">
-        <Providers>
-          {children}
-        </Providers>
-        <Toaster />
-        {/* Google Analytics */}
+        {/* Google Analytics - immediately after <head> as required */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-LCBKQFQ88F"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -105,6 +99,12 @@ export default function RootLayout({
             gtag('config', 'G-LCBKQFQ88F');
           `}
         </Script>
+      </head>
+      <body className="font-sans antialiased">
+        <Providers>
+          {children}
+        </Providers>
+        <Toaster />
       </body>
     </html>
   );
