@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/components/providers';
 
 const SITE_URL = 'https://www.coptic-society.org';
+const GA_ID = 'G-LCBKQFQ88F';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -86,19 +86,19 @@ export default function RootLayout({
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-        {/* Google Analytics - immediately after <head> as required */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-LCBKQFQ88F"
-          strategy="beforeInteractive"
+        {/* Google tag (gtag.js) - raw script tags ensure presence in server-rendered HTML */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_ID}');
+            `,
+          }}
         />
-        <Script id="google-analytics" strategy="beforeInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-LCBKQFQ88F');
-          `}
-        </Script>
       </head>
       <body className="font-sans antialiased">
         <Providers>
